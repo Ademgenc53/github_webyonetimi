@@ -1,4 +1,4 @@
-## Nasıl kurulur ## <br />
+## Nasıl kurulur <br />
 Tüm dosyaları bunun için oluşturacağınız domain klasörünün içine kopyalayın<br />
 Bir veri tabanı oluşturun<br />
 `includes` klasörün içindeki `github_webyonetimi.sql` veri tabanı yedeğini oluşturduğunuz veri tabanına PhpMyAdmin kullanarak yükleyin<br />
