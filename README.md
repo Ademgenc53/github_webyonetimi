@@ -1,8 +1,8 @@
-Nasıl kurulur<br />
+## Nasıl kurulur ## <br />
 Tüm dosyaları bunun için oluşturacağınız domain klasörünün içine kopyalayın<br />
 Bir veri tabanı oluşturun<br />
-includes klasörün içindeki github_webyonetimi.sql veri tabanı yedeğini oluşturduğunuz veri tabanına PhpMyAdmin kullanarak yükleyin<br />
-includes klasörün içindeki connect.php dosya text editör ile açarak aşağıdaki alana eklediğiniz veri tabanı bilgilerini girim<br />
+`includes` klasörün içindeki `github_webyonetimi.sql` veri tabanı yedeğini oluşturduğunuz veri tabanına PhpMyAdmin kullanarak yükleyin<br />
+`includes` klasörün içindeki `connect.php` dosya text editör ile açarak aşağıdaki alana eklediğiniz veri tabanı bilgilerini girim<br />
 
     defined('DB_USER')      or define('DB_USER', 'root');
     defined('DB_PASSWORD')  or define('DB_PASSWORD', '');
@@ -20,15 +20,15 @@ Aşağıdaki alanlar açıklamaları okuyup kendinize göre değiştirin<br />
 
 Ben robot değilim etkinleştirmek için domain adınıza keyleri oluşturmanız gerekiyor<br />
 Buradan https://www.google.com/recaptcha/ keyleri alın<br />
-login.php içinde data-sitekey="xxxxxxxxxxxxxxxxxxxxx" alana SİTE ANAHTARI girin<br />
-recaptcha.php içinde $secret = "xxxxxxxxxxxxxxxxxxxx"; alana GİZLİ ANAHTARI girin<br />
+`login.php` içinde `data-sitekey="xxxxxxxxxxxxxxxxxxxxx"` alana SİTE ANAHTARI girin<br />
+`recaptcha.php` içinde `$secret = "xxxxxxxxxxxxxxxxxxxx"` alana GİZLİ ANAHTARI girin<br />
 
 Kendi sunucunuzda bir klasöre ftp hesabı oluşturun ve siteye login olduktan sonra Ayarlar bölümündeki ftp alana girip kaydedin<br />
 
-Google Drive Servis Hesabı için aşağıdaki linki tıklayın "Servis Hesabı" oluşturun JSON dosyayı indirin<br />
+Google Drive Servis Hesabı için aşağıdaki linki tıklayın `Servis Hesabı` oluşturun JSON dosyayı indirin<br />
 https://console.cloud.google.com/apis/dashboard<br />
-Indirdiğiniz JSON dosyayı client_secrets.json olarak yeniden adlandırın ve aşağıdaki konuma kopyalayın<br />
-plugins/google_drive/client_json/client_secrets.json<br />
+Indirdiğiniz JSON dosyayı `client_secrets.json` olarak yeniden adlandırın ve aşağıdaki konuma kopyalayın<br />
+`plugins/google_drive/client_json/client_secrets.json`<br />
 
 Veri tabanı Ekle/Düzelt alanından bu sitenin veri tabanı bilgilerini ekleyin ve diğer varsa sitelerinizin de veri tabanı bilgilerini ekleyin tabı aynı sunucuda olacak<br />
 Görev Zamanlayıcı alanından yeni görevler ekleyebilirsiniz xxxxxx veri tabanı şu zamanda yedekle ve FTP ye ve veya Google la yedekle seçenekleri kullanabilirsiniz<br />
