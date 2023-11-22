@@ -110,7 +110,7 @@ $tabloadi='-Elle'; // Seçilen birden fazla tablo ise Elle metni dosyaya ekliyor
 // combine 3 ise Tabloları elle seçildi ve elle 2 seçeneği seçilen tabloları ayrı ayrı alt-klasöre yedekleyecek
 // Tabloların oluşturulacağı alt-dizin oluşturuyoruz
 if(isset($_POST['combine']) && $_POST['combine']=='3' && isset($_POST['elle']) && $_POST['elle']=='2'){
-define('SUBBACKUPDIR', './'.BACKUPDIR.'/'.$tarih_onek ) ;
+define('SUBBACKUPDIR', BACKUPDIR.'/'.$tarih_onek ) ;
 if(!file_exists(SUBBACKUPDIR)){
     if (!mkdir(SUBBACKUPDIR, 0777, true)) {
         die('Failed to create folders...');
@@ -258,9 +258,9 @@ echo db_genel_bilgi();
 
 // Tek dosyada yedekleme yolu ve dosya adı
 if($_POST['combine']=='1' OR $_POST['combine']=='3' AND $_POST['elle']!='2'){
-$handle = fopen('./'.BACKUPDIR.'/'.$tarih_onek.$tabloadi.'.sql','a');
+$handle = fopen(BACKUPDIR.'/'.$tarih_onek.$tabloadi.'.sql','a');
 // GZip için dosya yolu ve dosya adı
-$dosya = './'.BACKUPDIR.'/'.$tarih_onek.$tabloadi.'.sql';
+$dosya = BACKUPDIR.'/'.$tarih_onek.$tabloadi.'.sql';
 }
 
 $type = array();
