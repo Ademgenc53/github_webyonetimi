@@ -1,7 +1,7 @@
 ## Nasıl kurulur<br />
 Tüm dosyaları bunun için oluşturacağınız domain klasörünün içine kopyalayın<br />
 Bir veri tabanı oluşturun<br />
-`includes` klasörün içindeki `github_webyonetimi.sql` veri tabanı yedeğini oluşturduğunuz veri tabanına PhpMyAdmin kullanarak yükleyin<br />
+`includes` klasörün içindeki `webyonetimi.sql` veri tabanı yedeğini oluşturduğunuz veri tabanına PhpMyAdmin kullanarak yükleyin<br />
 `includes` klasörün içindeki `connect.php` dosya text editör ile açarak aşağıdaki alana eklediğiniz veri tabanı bilgilerini girim<br />
 
     defined('DB_USER')      or define('DB_USER', 'root');
