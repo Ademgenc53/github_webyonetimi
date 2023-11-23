@@ -51,12 +51,10 @@ Kullanıcı Adı: `admin@gmail.com`<br />
 
 `
 Drive'dan bir dizin ve içindeki dosyalarla beraber indirmek mümkün.
-
 Ancak, alt-dizinleri ve dosyaları olan dizini indirmek şimdilik mevcut değil. Bu özelliği eklemek için uzmanlarda yardım almak isteriz
 `
 
 `
 It is possible to download a directory from Drive along with the files in it.
-
 However, downloading the directory with sub-directories and files is not available for now. We would like to get help from experts to add this feature.
 `
