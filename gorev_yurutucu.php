@@ -262,7 +262,9 @@ fwrite($dosya,$yaz); fclose($dosya);
 
         $temiz_ftp = substr($ftp_output, strpos($ftp_output, '<span>')+6);
         $temiz_ftp = substr($temiz_ftp, 0, strpos($temiz_ftp, '</span>'));
+    if(!empty($temiz_ftp)){
         $calistirma_sonuc_mesaji .= "<br />".$temiz_ftp;
+    }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if($temiz_ftp == 'FTP ile Uzak Sunucuya Başarıyla Yedeklendi'){
         $ftpsilurl = $protocol."://".$_SERVER['SERVER_NAME']."/ftp_yedek_sil.php";
@@ -288,7 +290,9 @@ fwrite($dosya,$yaz); fclose($dosya);
 
         $temiz_ftpsil = substr($ftpsil_output, strpos($ftpsil_output, '<span>')+6);
         $temiz_ftpsil = substr($temiz_ftpsil, 0, strpos($temiz_ftpsil, '</span>'));
+    if(!empty($temiz_ftpsil)){
         $calistirma_sonuc_mesaji .= "<br />".$temiz_ftpsil;
+    }
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
@@ -325,7 +329,9 @@ fwrite($dosya,$yaz); fclose($dosya);
 
         $temiz_ftp = substr($ftp_output, strpos($ftp_output, '<span>')+6);
         $temiz_ftp = substr($temiz_ftp, 0, strpos($temiz_ftp, '</span>'));
+    if(!empty($temiz_ftp)){
         $calistirma_sonuc_mesaji .= "<br />".$temiz_ftp;
+    }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
     $dosya = fopen ("metin.txt" , "a"); //dosya oluşturma işlemi 
@@ -356,7 +362,9 @@ fwrite($dosya,$yaz); fclose($dosya);
 
         $temiz_googlesil = substr($googlesil_output, strpos($googlesil_output, '<span>')+6);
         $temiz_googlesil = substr($temiz_googlesil, 0, strpos($temiz_googlesil, '</span>'));
+    if(!empty($temiz_googlesil)){
         $calistirma_sonuc_mesaji .= "<br />".$temiz_googlesil;
+    }
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
@@ -524,7 +532,9 @@ fwrite($dosya,$yaz); fclose($dosya);
 
             $temiz_ftp = substr($ftp_output, strpos($ftp_output, '<span>')+6);
             $temiz_ftp = substr($temiz_ftp, 0, strpos($temiz_ftp, '</span>'));
+        if(!empty($temiz_ftp)){
             $calistirma_sonuc_mesaji .= "<br />".$temiz_ftp;
+        }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if($temiz_ftp == 'FTP ile Uzak Sunucuya Başarıyla Yedeklendi'){
         $ftpsilurl = $protocol."://".$_SERVER['SERVER_NAME']."/ftp_yedek_sil.php";
@@ -550,7 +560,9 @@ fwrite($dosya,$yaz); fclose($dosya);
 
         $temiz_ftpsil = substr($ftpsil_output, strpos($ftpsil_output, '<span>')+6);
         $temiz_ftpsil = substr($temiz_ftpsil, 0, strpos($temiz_ftpsil, '</span>'));
+    if(!empty($temiz_ftpsil)){
         $calistirma_sonuc_mesaji .= "<br />".$temiz_ftpsil;
+    }
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
@@ -586,7 +598,9 @@ fwrite($dosya,$yaz); fclose($dosya);
 
         $temiz_ftp = substr($ftp_output, strpos($ftp_output, '<span>')+6);
         $temiz_ftp = substr($temiz_ftp, 0, strpos($temiz_ftp, '</span>'));
+    if(!empty($temiz_ftp)){
         $calistirma_sonuc_mesaji .= "<br />".$temiz_ftp;
+    }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
     $dosya = fopen ("metin.txt" , "a"); //dosya oluşturma işlemi 
@@ -617,7 +631,9 @@ fwrite($dosya,$yaz); fclose($dosya);
 
         $temiz_googlesil = substr($googlesil_output, strpos($googlesil_output, '<span>')+6);
         $temiz_googlesil = substr($temiz_googlesil, 0, strpos($temiz_googlesil, '</span>'));
+    if(!empty($temiz_googlesil)){
         $calistirma_sonuc_mesaji .= "<br />".$temiz_googlesil;
+    }
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     } // if(isset($row['google_yedekle']) && $row['google_yedekle'] == 1){
