@@ -7,7 +7,7 @@ Bir veri tabanı oluşturun<br />
     defined('DB_USER')      or define('DB_USER', 'root');
     defined('DB_PASSWORD')  or define('DB_PASSWORD', '');
     defined('DB_HOST')      or define('DB_HOST', 'localhost');
-    defined('DB_NAME')      or define('DB_NAME', 'github_webyonetimi');
+    defined('DB_NAME')      or define('DB_NAME', 'webyonetimi');
     defined('PORT')         or define('PORT', '3306');
     defined('CHARSET')      or define('CHARSET', 'utf8mb4');
 
@@ -50,11 +50,11 @@ Kullanıcı Adı: `admin@gmail.com`<br />
 Şifre: `123456`<br />
 
 `
-Drive'dan bir dizin ve içindeki dosyalarla beraber indirmek mümkün.
+Drive'dan bir dizin ve içindeki dosyalarla beraber indirmek mümkün. 
 Ancak, alt-dizinleri ve dosyaları olan dizini indirmek şimdilik mevcut değil. Bu özelliği eklemek için uzmanlarda yardım almak isteriz
 `
 
 `
-It is possible to download a directory from Drive along with the files in it.
+It is possible to download a directory from Drive along with the files in it. 
 However, downloading the directory with sub-directories and files is not available for now. We would like to get help from experts to add this feature.
 `
