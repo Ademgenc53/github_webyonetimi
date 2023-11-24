@@ -105,12 +105,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gorevle_google_yedek_si
         }
     }
 
-    //echo '<pre>' . print_r($klasorler_dizi, true) . '</pre>';
+    //echo '<pre>' . print_r($results->getFiles(), true) . '</pre>';
     // Drive'dan aldığımız diziyi klasör ve dosya ayırıyoruz
     // Dosyadaki tarihleri alip unix zaman damgasına dönüştürüp keye giriyoruz ki bu sayede en yeniden eskiye sıralayabilelim
     $drive_dosyalar_arr = [];
     $drive_dizinler_arr = [];
     foreach ($results->getFiles() as $file) {
+
         if($file->getMimeType() == 'application/vnd.google-apps.folder'){
             $dizin_tarihi = substr($file->getName(), strpos($file->getName(), $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 16);
             if(validateDate($dizin_tarihi)){
@@ -118,7 +119,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gorevle_google_yedek_si
                 $unix_time = mktime(0, $minute, $hour, $month, $day, $year);
                 $drive_dizinler_arr[$unix_time][] = $file->getId(); //."|".$file->getName();
             }
-        }elseif($file->getMimeType() == 'application/zip'){
+        }else{
             $dosya_tarihi = substr($file->getName(), strpos($file->getName(), $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 16);
             if(validateDate($dosya_tarihi)){
                 list($year, $month, $day, $hour, $minute) = explode('-', $dosya_tarihi);
@@ -126,6 +127,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gorevle_google_yedek_si
                 $drive_dosyalar_arr[$unix_time][] = $file->getId(); //."|".$file->getName();
             }
         }
+
     }
 
     // Yeni dizileri en yeniden eskiye doğru sıralayalım

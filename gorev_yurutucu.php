@@ -242,10 +242,10 @@ fwrite($dosya,$yaz); fclose($dosya);
         $ftpurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuya_yedekle.php";
 
         $ftp_arr = array(
-            "id"                    => $row['id'],
-            "ftp_yedekle"           =>  1,
-            "ftpsonrakidizin"       =>  $row['uzak_sunucu_ici_dizin_adi'],
-            "dosya_adi_yolu"        =>  $cikis_sonucu['dosya_adi'],
+            "id"                            => $row['id'],
+            "ftp_yedekle"                   =>  1,
+            "ftpsonrakidizin"               =>  $row['uzak_sunucu_ici_dizin_adi'],
+            "dosya_adi_yolu"                =>  $cikis_sonucu['dosya_adi'],
             "uzak_sunucu_korunacak_yedek"   =>  $row['uzak_sunucu_korunacak_yedek']
         );
 
@@ -338,7 +338,7 @@ fwrite($dosya,$yaz); fclose($dosya);
     $yaz = "görev dosyasından\n".print_r($ftp_output, true); // Yazmak istediginiz yazı 
     fwrite($dosya,$yaz); fclose($dosya);
 */
-    if($ftp_output == "Dizin Başarıyla Google Drive'a Yüklendi"){
+    if($ftp_output == "Dizin Başarıyla Google Drive'a Yüklendi" || $ftp_output == "Dosya Başarıyla Google Drive'a Yüklendi"){
         $googlesilurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuda_dosyalari_sil.php";
 
         $googlesil_arr = array(
