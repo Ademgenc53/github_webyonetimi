@@ -130,7 +130,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gorevle_google_yedek_si
             if(validateDate($dosya_tarihi)){
                 list($year, $month, $day, $hour, $minute) = explode('-', $dosya_tarihi);
                 $unix_time = mktime($hour, $minute, 0, $month, $day, $year);
-                $drive_dosyalar_arr[$unix_time] = $file->getId(); //."|".$file->getName();
+                $drive_dosyalar_arr[$unix_time][] = $file->getId(); //."|".$file->getName();
             }
         }
     }
