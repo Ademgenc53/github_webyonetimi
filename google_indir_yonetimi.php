@@ -154,7 +154,7 @@ include('includes/sub_navbar.php');
     var firma = '';
 </script>
 
-<script type="text/javascript" >
+<script type="text/javascript">
 var gif =
 {
   lines: 10, // The number of lines to draw

@@ -147,14 +147,15 @@ include('includes/sub_navbar.php');
 <br />
         </div><!-- / <div class="content-wrapper"> -->
 
-<script type='text/javascript'>
+<script type="application/javascript">
     var satir = '';
     var query = '';
     var tarih = '';
     var firma = '';
 </script>
 
-<script type="text/javascript" >
+<script type="application/javascript">
+
 var gif =
 {
   lines: 10, // The number of lines to draw
@@ -406,7 +407,7 @@ $(document).ready( function() {
 
 			
             if( '<?php echo $genel_ayarlar['patch']; ?>' == root ) {
-            if(data=='<ul id="uzak" class="filetree" style="display: none;"></ul>'){
+            if(data=='<ul id="ftp_uzak" class="filetree" style="display: none;"></ul>'){
                 $( cont ).find('UL:hidden').show();
                 $("#ftp_uzak").append('<li class="uzak_home pointer"><a rel="<?php echo $genel_ayarlar['patch']; ?>">Ana Dizin<span style="float: right;color: black;padding-right: 10px;">4 KB</span></a></li>');
             }else{
