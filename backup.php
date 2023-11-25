@@ -9,6 +9,9 @@ set_time_limit(0);
 require('includes/connect.php');
 require_once("includes/turkcegunler.php");
 
+//Bu tarih yedek dosya adı ve klasör adı için kullanıcak.
+// !! BOŞLUKSUZ !!
+	define('datetime',date('Y-m-d-H-i-s')); /* Date fortmat. See: http://tr1.php.net/manual/en/function.date.php */
 #########################################################################################################################################
     // Ajax ile veritabanı ID geliyormu, geliyorsa hem değişkene hemde sessiona ata
     // Gelmiyorsa else den sesiiondan kullan

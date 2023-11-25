@@ -541,10 +541,10 @@ fwrite($dosya,$yaz); fclose($dosya);
         $ftpsilurl = $protocol."://".$_SERVER['SERVER_NAME']."/ftp_yedek_sil.php";
 
         $ftpsil_arr = array(
-            "id"                    => $row['id'],
-            "ftp_yedekle"           =>  1,
-            "ftpsonrakidizin"       =>  $row['uzak_sunucu_ici_dizin_adi'],
-            "dosya_adi_yolu"        =>  $cikis_sonucu['dosya_adi'],
+            "id"                            => $row['id'],
+            "ftp_yedekle"                   =>  1,
+            "ftpsonrakidizin"               =>  $row['uzak_sunucu_ici_dizin_adi'],
+            "dosya_adi_yolu"                =>  $cikis_sonucu['dosya_adi'],
             "uzak_sunucu_korunacak_yedek"   =>  $row['uzak_sunucu_korunacak_yedek']
         );
 
