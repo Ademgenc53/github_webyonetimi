@@ -339,6 +339,7 @@ fwrite($dosya,$yaz); fclose($dosya);
     fwrite($dosya,$yaz); fclose($dosya);
 */
     if($ftp_output == "Dizin Başarıyla Google Drive'a Yüklendi" || $ftp_output == "Dosya Başarıyla Google Drive'a Yüklendi"){
+
         $googlesilurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuda_dosyalari_sil.php";
 
         $googlesil_arr = array(

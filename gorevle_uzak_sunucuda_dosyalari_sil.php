@@ -28,6 +28,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gorevle_google_yedek_si
     $gorevler->execute([$_POST['id']]);
     $row = $gorevler->fetch();
 
+    // Veritabanı yedekleme ise
+    // gzip aktif ise
+    // Tek dosya ise
+    // Elle seçme tek dosya ise
+    if( $row['yedekleme_gorevi'] == '1' && ($row['combine'] == '1' || $row['combine'] == '3' && $row['elle'] == '1') ){ // Veritabanı yedekleme
+        if($row['gz'] == '1'){
+            $dosya_uzantisi = 'application/gzip';
+        }else{
+            $dosya_uzantisi = 'text/plain';
+        }
+    }elseif($row['yedekleme_gorevi'] == '2'){ // Web dizin yedekleme
+        $dosya_uzantisi = 'application/zip';
+    }elseif($row['yedekleme_gorevi'] == '3'){ // Kur güncelleme
+        $dosya_uzantisi = 'none';
+    }else{
+        $dosya_uzantisi = 'none';
+    }
+
     // Aynı dizin varsa ID sini ver
     function dir_exists($fileid, $service) {
         $folderId = $fileid;
@@ -119,7 +137,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gorevle_google_yedek_si
                 $unix_time = mktime(0, $minute, $hour, $month, $day, $year);
                 $drive_dizinler_arr[$unix_time][] = $file->getId(); //."|".$file->getName();
             }
-        }else{
+        }elseif($file->getMimeType() == $dosya_uzantisi){
             $dosya_tarihi = substr($file->getName(), strpos($file->getName(), $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 16);
             if(validateDate($dosya_tarihi)){
                 list($year, $month, $day, $hour, $minute) = explode('-', $dosya_tarihi);
