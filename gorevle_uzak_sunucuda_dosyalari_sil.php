@@ -28,22 +28,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gorevle_google_yedek_si
     $gorevler->execute([$_POST['id']]);
     $row = $gorevler->fetch();
 
-    // Veritabanı yedekleme ise
-    // gzip aktif ise
-    // Tek dosya ise
-    // Elle seçme tek dosya ise
-    if( $row['yedekleme_gorevi'] == '1' && ($row['combine'] == '1' || $row['combine'] == '3' && $row['elle'] == '1') ){ // Veritabanı yedekleme
-        if($row['gz'] == '1'){
-            $dosya_uzantisi = 'application/gzip';
-        }else{
-            $dosya_uzantisi = 'text/plain';
-        }
-    }elseif($row['yedekleme_gorevi'] == '2'){ // Web dizin yedekleme
-        $dosya_uzantisi = 'application/zip';
-    }elseif($row['yedekleme_gorevi'] == '3'){ // Kur güncelleme
-        $dosya_uzantisi = 'none';
-    }else{
-        $dosya_uzantisi = 'none';
+    if($row['yedekleme_gorevi'] == 1){
+        $sil_uzantilar = ["sql","gz"];
+    }elseif($row['yedekleme_gorevi'] == 2){
+        $sil_uzantilar = ["zip"];
     }
 
     // Aynı dizin varsa ID sini ver
@@ -116,7 +104,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gorevle_google_yedek_si
 
     // Yanlış dosya silmemek için dosyadaki tarihi alıp tarih mi kontrol ediyoruz
     if (!function_exists('validateDate')) {
-        function validateDate($date, $format = 'Y-m-d-H-i')
+        function validateDate($date, $format = 'Y-m-d-H-i-s')
         {
             $d = DateTime::createFromFormat($format, $date);
             return $d && $d->format($format) == $date;
@@ -131,22 +119,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gorevle_google_yedek_si
     foreach ($results->getFiles() as $file) {
 
         if($file->getMimeType() == 'application/vnd.google-apps.folder'){
-            $dizin_tarihi = substr($file->getName(), strpos($file->getName(), $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 16);
+            $dizin_tarihi = substr($file->getName(), strpos($file->getName(), $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 19);
             if(validateDate($dizin_tarihi)){
                 list($year, $month, $day, $hour, $minute) = explode('-', $dizin_tarihi);
-                $unix_time = mktime(0, $minute, $hour, $month, $day, $year);
+                $unix_time = mktime($hour, $minute, 0, $month, $day, $year);
                 $drive_dizinler_arr[$unix_time][] = $file->getId(); //."|".$file->getName();
             }
-        }elseif($file->getMimeType() == $dosya_uzantisi){
-            $dosya_tarihi = substr($file->getName(), strpos($file->getName(), $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 16);
+        }elseif(in_array(pathinfo($file->getName(), PATHINFO_EXTENSION), $sil_uzantilar)){
+            $dosya_tarihi = substr($file->getName(), strpos($file->getName(), $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 19);
             if(validateDate($dosya_tarihi)){
                 list($year, $month, $day, $hour, $minute) = explode('-', $dosya_tarihi);
-                $unix_time = mktime(0, $minute, $hour, $month, $day, $year);
-                $drive_dosyalar_arr[$unix_time][] = $file->getId(); //."|".$file->getName();
+                $unix_time = mktime($hour, $minute, 0, $month, $day, $year);
+                $drive_dosyalar_arr[$unix_time] = $file->getName(); //."|".$file->getName();
             }
         }
-
     }
+
+    //krsort($drive_dosyalar_arr);
+    //echo '<pre>Dosyalar: ' . print_r($drive_dosyalar_arr, true) . '</pre>';
 
     // Yeni dizileri en yeniden eskiye doğru sıralayalım
     if(isset($drive_dosyalar_arr) && count($drive_dosyalar_arr)>0) {

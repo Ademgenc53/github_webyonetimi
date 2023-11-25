@@ -237,7 +237,7 @@ fwrite($dosya,$yaz); fclose($dosya);
 #############################################################################################################################
 #############################################################################################################################
 #############################################################################################################################
-    if(isset($row['ftp_yedekle']) && $row['ftp_yedekle'] == 11){
+    if(isset($row['ftp_yedekle']) && $row['ftp_yedekle'] == 1){
 
         $ftpurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuya_yedekle.php";
 
@@ -858,7 +858,7 @@ if($row['yerel_korunacak_yedek'] != '-1'){
         //echo "<pre>" . print_r($dizinler, true) . "</pre>";
         //echo "<pre>" . print_r($dosyalar, true) . "</pre>";
     if (!function_exists('validateDate')){
-        function validateDate($date, $format = 'Y-m-d-H-i')
+        function validateDate($date, $format = 'Y-m-d-H-i-s')
         {
             $d = DateTime::createFromFormat($format, $date);
             return $d && $d->format($format) == $date;
@@ -870,7 +870,7 @@ if($row['yerel_korunacak_yedek'] != '-1'){
         while (count($dizinler) > $row['yerel_korunacak_yedek']) {
             $silinendizin = array_pop($dizinler);
                 //echo "<b>Bu dizin:</b> ".$yol.$silinendizin."<br />";
-                $dizin_tarihi = substr($silinendizin, -16);
+                $dizin_tarihi = substr($silinendizin, -19);
                 if(validateDate($dizin_tarihi)){
                     delete_directory($yol.$silinendizin);
                 }
@@ -880,7 +880,7 @@ if($row['yerel_korunacak_yedek'] != '-1'){
         while (count($dosyalar) > $row['yerel_korunacak_yedek']) {
                 $silinendosya = array_pop($dosyalar);
                 //echo "<b>Bu dosya:</b> ".$yol.$silinendosya."<br />";
-                $dosya_tarihi = substr($silinendosya, strpos($silinendosya, $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 16);
+                $dosya_tarihi = substr($silinendosya, strpos($silinendosya, $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 19);
                 if(validateDate($dosya_tarihi)){
                     unlink($yol.$silinendosya);
                 }

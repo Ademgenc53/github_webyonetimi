@@ -235,7 +235,7 @@ function deleteDirectoryRecursive($directory, $ftp) {
     }
 
     if (!function_exists('validateDate')) {
-            function validateDate($date, $format = 'Y-m-d-H-i')
+            function validateDate($date, $format = 'Y-m-d-H-i-s')
             {
                 $d = DateTime::createFromFormat($format, $date);
                 return $d && $d->format($format) == $date;
@@ -245,7 +245,7 @@ function deleteDirectoryRecursive($directory, $ftp) {
     if(count($ftpdeki_dosyalar)>0){
         while (count($ftpdeki_dosyalar) > $row['uzak_sunucu_korunacak_yedek']) {
             $silinendosya = array_pop($ftpdeki_dosyalar);
-            $dosya_tarihi = substr($silinendosya, strpos($silinendosya, $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 16);
+            $dosya_tarihi = substr($silinendosya, strpos($silinendosya, $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 19);
             if(validateDate($dosya_tarihi)){
                 deleteDirectoryRecursive( $silinendosya, $ftp);
                 //echo "<b style='color: red;'>Temsili Silinen dosya: </b>".$silinendosya."<br>";
@@ -256,7 +256,7 @@ function deleteDirectoryRecursive($directory, $ftp) {
     if(count($ftpdeki_dizinler)>0){
         while (count($ftpdeki_dizinler) > $row['uzak_sunucu_korunacak_yedek']) {
             $silinendizin = array_pop($ftpdeki_dizinler);
-            $dizin_tarihi = substr($silinendizin, -16);
+            $dizin_tarihi = substr($silinendizin, -19);
             if(validateDate($dizin_tarihi)){
                 deleteDirectoryRecursive( $silinendizin, $ftp);
                 //echo "<b style='color: blue;'>Temsili Silinen klasör: </b>".$silinendizin."<br>";
