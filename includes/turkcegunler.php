@@ -12,10 +12,6 @@
 
 // Genel ayarlarda zaman dilimini ayarlamak içiin yerel zamanı göstermek içindir
 	$yerel_tarihi = date('Y-m-d, H:i:s');
-
-//Bu tarih yedek dosya adı ve klasör adı için kullanıcak.
-// !! BOŞLUKSUZ !!
-	define('datetime',date('Y-m-d-H-i')); /* Date fortmat. See: http://tr1.php.net/manual/en/function.date.php */
 ######## Date&Time #############################################################
 
 function date_tr($f, $zt = 'now'){
