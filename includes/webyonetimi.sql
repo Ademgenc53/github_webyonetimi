@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS `zamanlanmisgorev` (
 DROP TABLE IF EXISTS `zamanlanmisgorev_gunluk`;
 CREATE TABLE IF NOT EXISTS `zamanlanmisgorev_gunluk` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `calistirma_ciktisi` varchar(100) DEFAULT NULL,
+  `calistirma_ciktisi` varchar(250) DEFAULT NULL,
   `gorev_adi` varchar(50) NOT NULL,
   `calistirilan_dosya` varchar(50) DEFAULT NULL,
   `calisma_zamani` int DEFAULT NULL,
