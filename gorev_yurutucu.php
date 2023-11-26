@@ -266,7 +266,7 @@ fwrite($dosya,$yaz); fclose($dosya);
         $calistirma_sonuc_mesaji .= "<br />".$temiz_ftp;
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if($temiz_ftp == 'FTP ile Uzak Sunucuya Başarıyla Yedeklendi'){
+    if($temiz_ftp == 'FTP Sunucusuna Başarıyla Yedeklendi'){
         $ftpsilurl = $protocol."://".$_SERVER['SERVER_NAME']."/ftp_yedek_sil.php";
 
         $ftpsil_arr = array(
@@ -305,9 +305,9 @@ fwrite($dosya,$yaz); fclose($dosya);
     $yaz = "görev dosyasından\n".print_r($cikis_sonucu, true); // Yazmak istediginiz yazı 
     fwrite($dosya,$yaz); fclose($dosya);
 */
-        $ftpurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuya_yedekle.php";
+        $googleurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuya_yedekle.php";
 
-        $ftp_arr = array(
+        $google_arr = array(
             "id"                            => $row['id'],
             "google_yedekle"                =>  1,
             "uzak_sunucu_ici_dizin_adi"     =>  $row['uzak_sunucu_ici_dizin_adi'],
@@ -316,21 +316,21 @@ fwrite($dosya,$yaz); fclose($dosya);
             "elle_yurutme"                  =>  isset($_POST['elle_yurutme']) ? $_POST['elle_yurutme'] : ""
         );
 
-        $ftp_ch = curl_init();
-        curl_setopt($ftp_ch, CURLOPT_URL, $ftpurl);
-        curl_setopt($ftp_ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ftp_ch, CURLOPT_HEADER, false);
-        curl_setopt($ftp_ch, CURLOPT_POST, count($ftp_arr));
-        curl_setopt($ftp_ch, CURLOPT_POSTFIELDS, http_build_query($ftp_arr));
-        curl_setopt($ftp_ch, CURLOPT_FRESH_CONNECT, true);
-        $ftp_out = curl_exec($ftp_ch);
+        $google_ch = curl_init();
+        curl_setopt($google_ch, CURLOPT_URL, $googleurl);
+        curl_setopt($google_ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($google_ch, CURLOPT_HEADER, false);
+        curl_setopt($google_ch, CURLOPT_POST, count($google_arr));
+        curl_setopt($google_ch, CURLOPT_POSTFIELDS, http_build_query($google_arr));
+        curl_setopt($google_ch, CURLOPT_FRESH_CONNECT, true);
+        $ftp_out = curl_exec($google_ch);
         $ftp_output = trim($ftp_out);
-        curl_close($ftp_ch);
+        curl_close($google_ch);
 
-        $temiz_ftp = substr($ftp_output, strpos($ftp_output, '<span>')+6);
-        $temiz_ftp = substr($temiz_ftp, 0, strpos($temiz_ftp, '</span>'));
-    if(!empty($temiz_ftp)){
-        $calistirma_sonuc_mesaji .= "<br />".$temiz_ftp;
+        $temiz_google = substr($ftp_output, strpos($ftp_output, '<span>')+6);
+        $temiz_google = substr($temiz_google, 0, strpos($temiz_google, '</span>'));
+    if(!empty($temiz_google)){
+        $calistirma_sonuc_mesaji .= "<br />".$temiz_google;
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -338,7 +338,7 @@ fwrite($dosya,$yaz); fclose($dosya);
     $yaz = "görev dosyasından\n".print_r($ftp_output, true); // Yazmak istediginiz yazı 
     fwrite($dosya,$yaz); fclose($dosya);
 */
-    if($ftp_output == "Dizin Başarıyla Google Drive'a Yüklendi" || $ftp_output == "Dosya Başarıyla Google Drive'a Yüklendi"){
+    if($ftp_output == "Google Drive Sunucusuna Başarıyla Yedeklendi"){
 
         $googlesilurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuda_dosyalari_sil.php";
 
@@ -537,7 +537,7 @@ fwrite($dosya,$yaz); fclose($dosya);
             $calistirma_sonuc_mesaji .= "<br />".$temiz_ftp;
         }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if($temiz_ftp == 'FTP ile Uzak Sunucuya Başarıyla Yedeklendi'){
+    if($temiz_ftp == 'FTP Sunucusuna Başarıyla Yedeklendi'){
         $ftpsilurl = $protocol."://".$_SERVER['SERVER_NAME']."/ftp_yedek_sil.php";
 
         $ftpsil_arr = array(

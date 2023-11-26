@@ -148,17 +148,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ftp_yedekle']) && $_POS
 
         // yükleme durumunu kontrol et
         if ($upload) {
-            echo "<span>FTP ile Uzak Sunucuya Başarıyla Yedeklendi</span>";
+            echo "<span>FTP Sunucusuna Başarıyla Yedeklendi</span>";
         } else {
-            echo "<span>Bir Hatadan Dolayın FTP ile Uzak Sunucuya Yedeklenemedi</span>";
+            echo "<span>FTP Sunucusuna Yükleme BAŞARISIZ</span>";
         }
 
     // Eğer yedeklenen dizin ise
     }else if(is_dir($yuklenecek_dizin_veya_dosya)){
         klasoruoku($full_directory);
-        echo "<span>FTP ile Uzak Sunucuya Başarıyla Yedeklendi</span>";
+        echo "<span>FTP Sunucusuna Başarıyla Yedeklendi</span>";
     }else{
-        echo "<span>Bir Hatadan Dolayın FTP ile Uzak Sunucuya Yedeklenemedi</span>";
+        echo "<span>FTP Sunucusuna Yükleme BAŞARISIZ</span>";
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -463,12 +463,12 @@ if(isset($_POST['uzak_sunucu_ici_dizin_adi']) && !empty($_POST['uzak_sunucu_ici_
             }
         }
         //echo "<strong>".str_replace(BACKUPDIR.'/', '', $path) . "</strong> Dizin Başarıyla Google Drive'a Yüklendi"; // Çoklu dosya yükleme tamamlandığında ki mesaj
-        echo "Dizin Başarıyla Google Drive'a Yüklendi"; // Çoklu dosya yükleme tamamlandığında ki mesaj
+        echo "<span>Google Drive Sunucusuna Başarıyla Yedeklendi</span>"; // Çoklu dosya yükleme tamamlandığında ki mesaj
     }else{
         if(createDirectoryPath($service, $path, $rootId))
         {
             //echo "<strong>".basename($path) . "</strong> Dosya Başarıyla Google Drive'a Yüklendi"; // Tek dosya yüklendiğindeki mesaj
-            echo "Dosya Başarıyla Google Drive'a Yüklendi"; // Tek dosya yüklendiğindeki mesaj
+            echo "<span>Google Drive Sunucusuna Başarıyla Yedeklendi</span>"; // Tek dosya yüklendiğindeki mesaj
         }
     }
 
