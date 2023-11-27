@@ -39,7 +39,8 @@ $service = new Google\Service\Drive($client);
 
     $folderId = isset($_POST['dir']) ? $_POST['dir'] : 'root';
     $results = $service->files->listFiles(array(
-        'q' => "'$folderId' in parents"
+        'q' => "'$folderId' in parents",
+	'orderBy' => 'name'
     ));
     $drive_dizinler_arr = [];
     $drive_dosyalar_arr = [];
