@@ -338,7 +338,7 @@ fwrite($dosya,$yaz); fclose($dosya);
     $yaz = "görev dosyasından\n".print_r($ftp_output, true); // Yazmak istediginiz yazı 
     fwrite($dosya,$yaz); fclose($dosya);
 */
-    if($ftp_output == "Google Drive Sunucusuna Başarıyla Yedeklendi"){
+    if($temiz_google == "Google Drive Sunucusuna Başarıyla Yedeklendi"){
 
         $googlesilurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuda_dosyalari_sil.php";
 
