@@ -1,10 +1,12 @@
 <?php 
 // Bismillahirrahmanirrahim
     if(isset($_POST['elle_yurutme']) && $_POST['elle_yurutme'] == 1 && isset($_POST['gorevid']) && is_numeric($_POST['gorevid'])){
-ini_set('memory_limit', '-1');
-ignore_user_abort(true);
-set_time_limit(0);
-require('includes/connect.php');
+
+    ini_set('memory_limit', '-1');
+    ignore_user_abort(true);
+    set_time_limit(0);
+    require('includes/connect.php');
+
     $cikis_sonuc = "";
     $calistirma_sonuc_mesaji = "";
     $otomatikyedeksil = false;
@@ -57,9 +59,9 @@ ob_flush();
 flush();
 */
 ##########################################################################################################################################
-        // Çalıştırılacak dosya veritabanı yedekeme ise aşağıdaki kodu çalıştır
-        $post_dizi = [];
-        if($row['yedekleme_gorevi'] == '1' && is_numeric($row['secilen_yedekleme'])){
+    // Çalıştırılacak dosya veritabanı yedekeme ise aşağıdaki kodu çalıştır
+    $post_dizi = [];
+    if($row['yedekleme_gorevi'] == '1' && is_numeric($row['secilen_yedekleme'])){
 
 #########################################################################################################################################
     // Seçilen veritabanı 
@@ -338,7 +340,7 @@ fwrite($dosya,$yaz); fclose($dosya);
     $yaz = "görev dosyasından\n".print_r($ftp_output, true); // Yazmak istediginiz yazı 
     fwrite($dosya,$yaz); fclose($dosya);
 */
-    if($temiz_google == "Google Drive Sunucusuna Başarıyla Yedeklendi"){
+    if($ftp_output == "Google Drive Sunucusuna Başarıyla Yedeklendi"){
 
         $googlesilurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuda_dosyalari_sil.php";
 
@@ -366,18 +368,18 @@ fwrite($dosya,$yaz); fclose($dosya);
     if(!empty($temiz_googlesil)){
         $calistirma_sonuc_mesaji .= "<br />".$temiz_googlesil;
     }
-    }
+    } // if($ftp_output == "Google Drive Sunucusuna Başarıyla Yedeklendi"){
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    }
+    } // if(isset($row['google_yedekle']) && $row['google_yedekle'] == 1){
 #############################################################################################################################
 #############################################################################################################################
 #############################################################################################################################
+
 /*
         $dosya = fopen ("gorev_yurutme.txt" , "a"); //dosya oluşturma işlemi 
         $yaz = print_r($temiz_ftpsil, true); // Yazmak istediginiz yazı 
         fwrite($dosya,$yaz); fclose($dosya);
 */
-
 
         //Başarılı görev bir sonraki zamana güncelle
         if( $row['aktif'] == 'Aktif' ){
@@ -566,7 +568,7 @@ fwrite($dosya,$yaz); fclose($dosya);
     }
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        }
+    } // if(isset($row['ftp_yedekle']) && $row['ftp_yedekle'] == 1){
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -576,7 +578,7 @@ fwrite($dosya,$yaz); fclose($dosya);
     $yaz = "görev dosyasından\n".print_r($cikis_sonucu, true); // Yazmak istediginiz yazı 
     fwrite($dosya,$yaz); fclose($dosya);
 */
-        $ftpurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuya_yedekle.php";
+        $googleurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuya_yedekle.php";
 
         $ftp_arr = array(
             "id"                            => $row['id'],
@@ -586,29 +588,29 @@ fwrite($dosya,$yaz); fclose($dosya);
             "uzak_sunucu_korunacak_yedek"   =>  $row['uzak_sunucu_korunacak_yedek']
         );
 
-        $ftp_ch = curl_init();
-        curl_setopt($ftp_ch, CURLOPT_URL, $ftpurl);
-        curl_setopt($ftp_ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ftp_ch, CURLOPT_HEADER, false);
-        curl_setopt($ftp_ch, CURLOPT_POST, count($ftp_arr));
-        curl_setopt($ftp_ch, CURLOPT_POSTFIELDS, http_build_query($ftp_arr));
-        curl_setopt($ftp_ch, CURLOPT_FRESH_CONNECT, true);
-        $ftp_out = curl_exec($ftp_ch);
-        $ftp_output = trim($ftp_out);
-        curl_close($ftp_ch);
+        $google_ch = curl_init();
+        curl_setopt($google_ch, CURLOPT_URL, $googleurl);
+        curl_setopt($google_ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($google_ch, CURLOPT_HEADER, false);
+        curl_setopt($google_ch, CURLOPT_POST, count($ftp_arr));
+        curl_setopt($google_ch, CURLOPT_POSTFIELDS, http_build_query($ftp_arr));
+        curl_setopt($google_ch, CURLOPT_FRESH_CONNECT, true);
+        $google_out = curl_exec($google_ch);
+        $google_output = trim($google_out);
+        curl_close($google_ch);
 
-        $temiz_ftp = substr($ftp_output, strpos($ftp_output, '<span>')+6);
-        $temiz_ftp = substr($temiz_ftp, 0, strpos($temiz_ftp, '</span>'));
-    if(!empty($temiz_ftp)){
-        $calistirma_sonuc_mesaji .= "<br />".$temiz_ftp;
+        $temiz_google = substr($google_output, strpos($google_output, '<span>')+6);
+        $temiz_google = substr($temiz_google, 0, strpos($temiz_google, '</span>'));
+    if(!empty($temiz_google)){
+        $calistirma_sonuc_mesaji .= "<br />".$temiz_google;
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
     $dosya = fopen ("metin.txt" , "a"); //dosya oluşturma işlemi 
-    $yaz = "görev dosyasından\n".print_r($ftp_output, true); // Yazmak istediginiz yazı 
+    $yaz = "görev dosyasından\n".print_r($google_output, true); // Yazmak istediginiz yazı 
     fwrite($dosya,$yaz); fclose($dosya);
 */
-    if($ftp_output == "Dosya Başarıyla Google Drive'a Yüklendi"){
+    if($temiz_google == "Google Drive Sunucusuna Başarıyla Yedeklendi"){
         $googlesilurl = $protocol."://".$_SERVER['SERVER_NAME']."/gorevle_uzak_sunucuda_dosyalari_sil.php";
 
         $googlesil_arr = array(
