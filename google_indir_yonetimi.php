@@ -176,6 +176,7 @@ var gif =
 
     function uzakSunucudanIndir() {
         var google_drive_dan_secilen_dosya_id = $('#google_drive_dan_secilen_dosya_id').val();
+        var google_drive_dan_secilen_dosya_adini_goster = $('#google_drive_dan_secilen_dosya_adini_goster').val();
         var yerel_den_secilen_dosya = $('#yerel_den_secilen_dosya').val();
         var dosyami_dizinmi = yerel_den_secilen_dosya.replace(/^.*?\.([a-zA-Z0-9]+)$/, "$1");
 
@@ -212,7 +213,7 @@ var gif =
             $.ajax({
                 type: "POST",
                 url: "google_den_yerele_indir.php",
-                data: { google_drive_dan_secilen_dosya_id: google_drive_dan_secilen_dosya_id, yerel_den_secilen_dosya: yerel_den_secilen_dosya },
+                data: { google_drive_dan_secilen_dosya_id: google_drive_dan_secilen_dosya_id, yerel_den_secilen_dosya: yerel_den_secilen_dosya, google_drive_dan_secilen_dosya_adini_goster: google_drive_dan_secilen_dosya_adini_goster },
                 success: function (msg) {
                 $(function () {
                     pen.icerik(msg);

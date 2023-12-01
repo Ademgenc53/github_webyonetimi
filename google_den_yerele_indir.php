@@ -30,72 +30,90 @@ $service = new Google\Service\Drive($client);
         flush();
         ob_start();
     }
-    // Kaynaktan seçilen klasör olmadığını kontrol ediyoruz
-    function isDir($dirid, $service) {
-        $file = $service->files->get($dirid);
-        return array($file->getName(),$file->getMimeType());
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Dizin içindeki dosyaları ve alt dizinleri listele
+    function listFiles($secilen_dizin, $service, $folderId, $path = '') {
+    $resultArray = [];
+    $results = $service->files->listFiles([
+        'orderBy' => "name",
+        'q' => "'$folderId' in parents",
+    ]);
+
+    foreach ($results->getFiles() as $file) {
+        $filePath = $path . '/' . $file->getName();
+
+        $resultArray[$file->getId()][$file->mimeType] = "/".$secilen_dizin.$filePath;
+        
+        if ($file->mimeType == 'application/vnd.google-apps.folder') {
+        // Eğer dosya bir klasör ise, alt dizinleri listele
+            $resultArray = array_merge($resultArray, listFiles($secilen_dizin, $service, $file->getId(), $filePath));
+        }
     }
-    
+    return $resultArray;
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     if(isset($_POST['yerel_den_secilen_dosya']) && isset($_POST['google_drive_dan_secilen_dosya_id'])){
-        // Kaynaktan 
-        $kaynak_nedir = isDir($_POST['google_drive_dan_secilen_dosya_id'], $service);
 
+        // Hedef dizin adının sonunda eğik çizgi varsa kaldıralım sonra ekleyelim
+        $yerel_hedef = rtrim($_POST['yerel_den_secilen_dosya'], '/');
+        // Kaynak googleden seçilen dizin veya dosya adının önünde veya arkasında eğik çizgi varsa kaldıralım
+        $google_kaynak = ltrim(rtrim($_POST['google_drive_dan_secilen_dosya_adini_goster'],'/'),'/');
+        // Kaynak googleden seçilen dizin veya dosya ID si
         $fileId = $_POST['google_drive_dan_secilen_dosya_id'];
-        // Kaynaktan root veya dizin ID geldi ise ana veya seçilen dizindeki tüm dosya ve klasörleri listele
-        $drive_dosyalar_arr = [];
-        if(isset($_POST['google_drive_dan_secilen_dosya_id']) && ($_POST['google_drive_dan_secilen_dosya_id'] == 'root' || $kaynak_nedir[1] == 'application/vnd.google-apps.folder')){
-            $folderId = $_POST['google_drive_dan_secilen_dosya_id'];
-            $results = $service->files->listFiles(array(
-                'q' => "'$folderId' in parents"
-            ));
 
-            // root daki tüm dosya ve dizinleri diziye alıyoruz
-            foreach ($results->getFiles() as $file) {
-                $drive_dosyalar_arr[$file->getId()] = $file->getName();
-            }
+        // Googleden seçilen kaynak dosya ise
+        if(pathinfo($google_kaynak, PATHINFO_EXTENSION)){
 
-
-        // Kaynakta root değil de dosya ID si geldi ise diziye alıyoruz
-        }elseif(isset($_POST['google_drive_dan_secilen_dosya_id']) && $_POST['google_drive_dan_secilen_dosya_id'] != 'root' && $kaynak_nedir[1] != 'application/vnd.google-apps.folder'){
-            // Tek dosya seçildi ise dosya ID ile diziye alıyoruz
-            $file = $service->files->get($fileId);
-            $drive_dosyalar_arr[$file->getId()] = $file->getName();
-        }
-//echo '<pre>' . print_r($drive_dosyalar_arr, true) . '</pre>';
-
-        // Oluşturduğumuz dizi ile dosyaları indiriyoruz
-        foreach($drive_dosyalar_arr AS $fileId => $fileName)
-        {
-//echo $fileName."<br>";
-
-            // Dosyayı indir.
             $content = $service->files->get($fileId, array("alt" => "media"));
-            // Kaynakta seçilen dizin ise dizinide indir
-            $kaynak_dizin = $kaynak_nedir[1] == 'application/vnd.google-apps.folder' && $kaynak_nedir[0] != 'My Drive' ? $kaynak_nedir[0]."/" : "";
-            // Hedef dizin adının sonunda eğik çizgi yoksa ekleyelim
-            $dirname = substr($_POST['yerel_den_secilen_dosya'], -1) == '/' ? $_POST['yerel_den_secilen_dosya'] : $_POST['yerel_den_secilen_dosya']."/";
-            // Yerelde dizin yoksa önce dizin oluşturalım
-            if (!is_dir($dirname.$kaynak_dizin))
-            {
-                mkdir($dirname.$kaynak_dizin, 0755, true);
-            }
+        
             // Dosyaları indirelim
-            $handle = fopen($dirname.$kaynak_dizin.$fileName, "w+");
+            $handle = fopen($yerel_hedef.$google_kaynak, "w+");
             while (!$content->getBody()->eof()) {
                 fwrite($handle, $content->getBody()->read(1024));
             }
-        // Sonucu ekrana yazalım
-        echo "<br /><b>Yerel </b> ".$dirname.$kaynak_dizin." <b>dizine</b><br />";
-        echo $fileName." [KOPYALANDI]";
-        fls();
+            fclose($handle);
+
+            echo "<br /><b>Yerel </b> ".$yerel_hedef." <b>dizine</b><br />";
+            echo $google_kaynak." <b>[KOPYALANDI]</b>";
+
+        }else{ // Googleden seçilen dizin ise
+            // Googleden seçilen dizin adını diziye eklemek için fonksiyona gönderiyoruz
+            $secilen_dizin = $google_kaynak;
+            $googleden_secilen_dizin_arr[$fileId]['application/vnd.google-apps.folder'] = "/".$google_kaynak;
+            $filePathsArray = listFiles($secilen_dizin, $service, $fileId);
+            $secilen_googleden_secilen_array = array_merge($googleden_secilen_dizin_arr, $filePathsArray);
+
+            echo "<br /><b>Yerel </b> ".$yerel_hedef." <b>dizine</b><br />";
+            foreach($secilen_googleden_secilen_array AS $id => $dosya_tipi_dosya_adi)
+            {
+                foreach($dosya_tipi_dosya_adi AS $dosya_tipi => $dosya_adi)
+                {
+                    if( $dosya_tipi == 'application/vnd.google-apps.folder' ){
+                        if (!file_exists($yerel_hedef.$dosya_adi)) {
+                            mkdir($yerel_hedef.$dosya_adi, 0755, true);
+                        }
+                    }else{
+                        $content = $service->files->get($id, array("alt" => "media"));
+                        // Dosyaları indirelim
+                        $handle = fopen($yerel_hedef.$dosya_adi, "w+");
+                        while (!$content->getBody()->eof()) {
+                            fwrite($handle, $content->getBody()->read(1024));
+                        }
+                            echo $dosya_adi." <b>[KOPYALANDI]</b><br />";
+                    }
+                }
+            }
+            fclose($handle);
         }
-        
-        fclose($handle);
 
     }else{
         echo "Kaynak ve indirilecek dizin seçilmelidir";
     }
-
 
 ?>
