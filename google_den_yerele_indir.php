@@ -37,18 +37,19 @@ $service = new Google\Service\Drive($client);
     function listFiles($secilen_dizin, $service, $folderId, $path = '') {
     $resultArray = [];
     $results = $service->files->listFiles([
-        'orderBy' => "name",
+        //'orderBy' => "name",
         'q' => "'$folderId' in parents",
     ]);
 
     foreach ($results->getFiles() as $file) {
         $filePath = $path . '/' . $file->getName();
 
-        $resultArray[$file->getId()][$file->mimeType] = "/".$secilen_dizin.$filePath;
-        
-        if ($file->mimeType == 'application/vnd.google-apps.folder') {
         // Eğer dosya bir klasör ise, alt dizinleri listele
+        if ($file->mimeType == 'application/vnd.google-apps.folder') {
             $resultArray = array_merge($resultArray, listFiles($secilen_dizin, $service, $file->getId(), $filePath));
+            $resultArray[$file->getId()][$file->mimeType] = "/".$secilen_dizin.$filePath;
+        }else{
+            $resultArray[$file->getId()][$file->mimeType] = "/".$secilen_dizin.$filePath;
         }
     }
     return $resultArray;
@@ -89,6 +90,12 @@ $service = new Google\Service\Drive($client);
             $filePathsArray = listFiles($secilen_dizin, $service, $fileId);
             $secilen_googleden_secilen_array = array_merge($googleden_secilen_dizin_arr, $filePathsArray);
 
+
+    $dosya = fopen ("metin.txt" , "a"); //dosya oluşturma işlemi 
+    $yaz = "görev dosyasından\n".print_r($secilen_googleden_secilen_array, true); // Yazmak istediginiz yazı 
+    fwrite($dosya,$yaz); fclose($dosya);
+
+
             echo "<br /><b>Yerel </b> ".$yerel_hedef." <b>dizine</b><br />";
             foreach($secilen_googleden_secilen_array AS $id => $dosya_tipi_dosya_adi)
             {
@@ -98,7 +105,15 @@ $service = new Google\Service\Drive($client);
                         if (!file_exists($yerel_hedef.$dosya_adi)) {
                             mkdir($yerel_hedef.$dosya_adi, 0755, true);
                         }
-                    }else{
+                    }
+                }
+            }
+////////////////////////////////////////////////////////////////////////////////////////////
+            foreach($secilen_googleden_secilen_array AS $id => $dosya_tipi_dosya_adi)
+            {
+                foreach($dosya_tipi_dosya_adi AS $dosya_tipi => $dosya_adi)
+                {
+                    if( $dosya_tipi != 'application/vnd.google-apps.folder' ){
                         $content = $service->files->get($id, array("alt" => "media"));
                         // Dosyaları indirelim
                         $handle = fopen($yerel_hedef.$dosya_adi, "w+");
