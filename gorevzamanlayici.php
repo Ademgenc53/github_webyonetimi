@@ -1361,7 +1361,7 @@ include('includes/sub_navbar.php');
     </tr>
 
     <tr>
-        <td>Uzak Buluta Yedekle</td>
+        <td>Uzağa Yedekle</td>
         <td style="text-align:right;">FTP</td>
         <td>
         <?php 
@@ -1461,7 +1461,7 @@ include('includes/sub_navbar.php');
     </tr>
 
     <tr>
-        <td>Uzak Buluta Yedekle</td>
+        <td>Uzağa Yedekle</td>
         <td style="text-align:right;">FTP</td>
         <td>
         <?php 
@@ -1793,7 +1793,7 @@ include('includes/sub_navbar.php');
     </tr>
 
     <tr>
-        <td>Uzak Buluta Yedekle</td>
+        <td>Uzağa Yedekle</td>
         <td style="text-align:right;">FTP</td>
         <td><input type="checkbox" name="dizin_ftp_yedekle" id="dizin_ftp_yedekle" value="1" /></td>
         <td style="text-align:right;">Google Drive</td>
@@ -1866,7 +1866,7 @@ include('includes/sub_navbar.php');
     </tr>
 
     <tr>
-        <td>Uzak Buluta Yedekle</td>
+        <td>Uzağa Yedekle</td>
         <td style="text-align:right;">FTP</td>
         <td><input type="checkbox" name="veritabani_ftp_yedekle" id="veritabani_ftp_yedekle" value="1" /></td>
         <td style="text-align:right;">Google Drive</td>
