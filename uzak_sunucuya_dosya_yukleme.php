@@ -27,138 +27,148 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     //echo '<pre>' . print_r($_POST, true) . '</pre>';
     //exit;
 }
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Her yerel alandan googla yükleme kodu
 if(isset($_POST['googla_yukle']) && $_POST['googla_yukle'] == '1' && isset($_POST['yerel_den_secilen_dosya']) && !empty($_POST['yerel_den_secilen_dosya']) && isset($_POST['google_drive_dan_secilen_dosya_id']) && !empty($_POST['google_drive_dan_secilen_dosya_id']))
 {
-    // Upload the file to the specified directory
-    // Sadece tek dosya yükleme fonksiyonu
-    function insertFile($service, $parentId, $filename) {
-        $file = new Google_Service_Drive_DriveFile();
-        $file->setName(basename($filename));
-        $file->setMimeType(mime_content_type($filename));
-        $parentId = !empty($parentId) ? $parentId : null;
-        $file->setParents(array($parentId));
-        try {
-            $data = file_get_contents($filename);
-            $createdFile = $service->files->create($file, array(
-            'data' => $data,
-            'mimeType' => mime_content_type($filename),
-            ));
-            // Uncomment the following line to print the File ID
-            // print 'File ID: %s' % $createdFile->getId();
-            return $createdFile->getName();
-        } catch (Exception $e) {
-            print "Tek dosya yükleme fonsiyonun da bir hata oluştu: " . $e->getMessage();
-        }
-    }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Klasör veya Dosya var mı yokmu kontrolu yapan fonksiyon
-    function dir_exists($fileid, $service) {
-        $folderId = $fileid;
-        $results = $service->files->listFiles(array(
-            'q' => "'$folderId' in parents"
-        ));
-        $klasorler_dizi = [];
-        foreach ($results->getFiles() as $file) {
-            $klasorler_dizi[$file->getId()] = $file->getName();
-        }
-        return $klasorler_dizi;
-    }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Yerelden gelen kaynak klasör ise bu fonksiyondan dizin yolu parçalayıp
-    // dizin oluşturmak için bir alttaki fonksiyona gönderiyoruz dosya ise
-    // yüklemek için iki üsteki fonksiyona gönderiyoruz
-    function createDirectoryPath($service, $source_selected, $parentId = 'root') {
-        // Dizinler varsa parçala
-        $source = str_replace(array('../', './', BACKUPDIR.'/'), '', $source_selected); //Eğer dizin yolunda BACKUPDIR varsa bu dizini oluşturma
-        $directories = explode('/', $source);
 
-            foreach ($directories as $directory) {
-                // Sıradaki döngü "$directory" ile parçalanan dizinin son öğesi ile aynı mı? ve
-                // Tam "$source_selected" kaynağın son öğesi dizin mi 
-                // Sıradaki döngü öğe ile dizinin son öğesi aynı ve kaynağın son öğesi dosya ise yükle
-                if($directory == end($directories) && !is_dir($source_selected))
-                {
-                    // Dosya yüklemek için tam dosya yolu lazım olduğu "$source_selected" kullanıyoruz
-                    $dizinveyadosyavarmi = dir_exists($parentId, $service);
-                    if(!in_array($directory, $dizinveyadosyavarmi))
-                    {
-                    insertFile($service, $parentId, $source_selected);
-                    }
-                }
-                else
-                {
-                    // Dizin ve alt dizinleri oluşturuyoruz
-                    $dizinveyadosyavarmi = dir_exists($parentId, $service);
+##################################################################################################################################
+##################################################################################################################################
+// Belirli bir klasörde dosya arama
+function searchFile($service, $parentId, $fileName) {
+    $results = $service->files->listFiles([
+        'q' => "name='".$fileName."' and '".$parentId."' in parents",
+    ]);
 
-                    //echo '<pre>' . print_r($dizinveyadosyavarmi, true) . '</pre>';
-                    if(in_array($directory, $dizinveyadosyavarmi))
-                    {
-                        $dizinveyadosyavarmi = array_flip($dizinveyadosyavarmi);
-                        $parentId = $dizinveyadosyavarmi[$directory];
-                    }
-                    else
-                    {
-                        $parentId = createSubdirectory($service, $parentId, $directory);
-                    }
+    if (count($results->getFiles()) > 0) {
+        return $results->getFiles()[0];
+    } else {
+        return null;
+    }
+}
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+// Klasör ve alt içerikleri yükleme fonksiyonu
+function uploadFolder($service, $parentId, $folderPath) {
+    GLOBAL $google_hedef_adi;
+    $google_hedefadi = $google_hedef_adi == 'root' ? '' : $google_hedef_adi;
+    $folderName = basename($folderPath);
+
+    // Klasörün mevcut olup olmadığını kontrol et
+    $existingFolder = searchFile($service, $parentId, $folderName);
+
+    if ($existingFolder) {
+        $createdFolder = $existingFolder;
+    } else {
+        // Klasörü oluştur
+        $folder = new Google_Service_Drive_DriveFile();
+        $folder->setName($folderName);
+        $folder->setMimeType('application/vnd.google-apps.folder');
+        $folder->setParents([$parentId]);
+
+        $createdFolder = $service->files->create($folder);
+    }
+
+    // Klasör içindeki dosyaları yükle
+    $files = scandir($folderPath);
+    foreach ($files as $file) {
+        if ($file != '.' && $file != '..') {
+            $filePath = $folderPath . '/' . $file;
+
+            if (is_dir($filePath)) {
+                // Eğer dosya bir klasör ise, alt klasörü yükle
+                uploadFolder($service, $createdFolder->id, $filePath);
+            } else {
+                // Eğer dosya bir dosya ise, dosyayı yükle
+                $existingFile = searchFile($service, $createdFolder->id, $file);
+
+                if ($existingFile) {
+                    // Dosya zaten varsa, üzerine yaz
+                    $existing_File = new Google_Service_Drive_DriveFile();
+                    $service->files->update($existingFile->getId(), $existing_File, array(
+                        'data' => $filePath,
+                        'mimeType' => mime_content_type($filePath),
+                        'uploadType' => 'multipart'
+                    ));
+                    $cikti_yolu_adi = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), '', $filePath);
+                    echo "<span style='color: red'>Dosyanın üzerine yazıldı:</span> ".$google_hedefadi."/".$cikti_yolu_adi."<br />";
+                } else {
+                    // Dosya yoksa, yeni dosya oluştur
+                    $fileMetadata = new Google_Service_Drive_DriveFile();
+                    $fileMetadata->setName($file);
+                    $fileMetadata->setParents([$createdFolder->id]);
+                    $createdFile = $service->files->create($fileMetadata, [
+                        'data' => $filePath,
+                        'mimeType' => mime_content_type($filePath),
+                        'uploadType' => 'multipart',
+                    ]);
+                    $cikti_yolu_adi = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), '', $filePath);
+                    echo "<span style='color: blue;'>Dosya yüklendi:</span> ".$google_hedefadi."/".$cikti_yolu_adi."<br />";
                 }
             }
-            return $parentId; // Oluşturulan son klasörün ID si
+        }
     }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Bir üsteki fonksiyondan gelecek dizin adı ile dizin oluşturma fonksiyonu
-    function createSubdirectory($service, $parentId, $subdirectoryName) {
-        $fileMetadata = new Google_Service_Drive_DriveFile(array(
-            'name' => $subdirectoryName,
-            'mimeType' => 'application/vnd.google-apps.folder',
-            'parents' => $parentId ? array($parentId) : null
-        ));
+}
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+$yerelden_secilen = rtrim($_POST['yerel_den_secilen_dosya'], '/');
+$google_hedef_id = $_POST['google_drive_dan_secilen_dosya_id'];
+$google_hedef_adi = $_POST['google_drive_dan_secilen_dosya_adini_goster'];
 
-        try {
-            $folder = $service->files->create($fileMetadata, array('fields' => 'id'));
-            //printf("Klasör ID: %s\n", $folder->id);
-            //echo "<br />";
-            return $folder->id; // Oluşturulan klasörün ID sini döndür
-        } catch (Exception $e) {
-            //echo "Bir hata oluştu: " . $e->getMessage();
-        }
-        return null; // Bir şeyler ters giderse null değerini döndür
-    }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Yerelden gelen kaynağın önce önündeki ve sonundaki eğik çizgilerini kaldırıyoruz
-    // Sonra yerelden gelen kaynağın dizin mi yoksa dosya mı kontrolu yapıyoruz
-    // Eğer dizin ise döngü ile dizin yolları ile beraber dosyaların listesini oluşturup
-    // Her satırı createDirectoryPath() fonksiyona gönderiyoruz
-    // Eğer kaynak dosya ise döngüye sokmadan direk createDirectoryPath() fonksiyona gönderiyoruz
-    $path = ltrim(rtrim($_POST['yerel_den_secilen_dosya'],'/'),'/');
-    $rootId = $_POST['google_drive_dan_secilen_dosya_id'];
-    if(is_dir($path)){
-        $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-        //echo "<table border='1'>";
-        foreach($objects as $file => $object){
-            if (substr($file, -1) != '.' && substr($file, -2) != '..')
-            {
-                $file = str_replace(array('\\','\\\\','//'), '/', $file);
-                //echo $file."<br />";
-                createDirectoryPath($service, $file, $rootId);
-                //echo "<tr><td>".$file . "</td><td> <b>klasör ve dosyaları başarıyla yüklendi</b></td></tr>"; // Her öğe yükleme donrası mesaj
-                //fls();
-            }
-        }
-        //echo "</table>";
-        echo "<strong>".str_replace(BACKUPDIR.'/', '', $path) . "</strong> Dizin Başarıyla Google Drive'a Yüklendi"; // Çoklu dosya yükleme tamamlandığında ki mesaj
+try {
+    searchFile($service, $google_hedef_id, $google_hedef_adi);
+} catch (Exception $e) {
+    echo 'Yakalanan olağandışı durum mesajı: ';
+    echo '<pre>' . print_r(json_decode($e->getMessage(), true), true) . '</pre>';
+    echo 'Hata mesajını çözmek için bu linki tıklayın<br /><a target="_blank" href="https://developers.google.com/drive/api/guides/handle-errors?hl=tr">https://developers.google.com/drive/api/guides/handle-errors?hl=tr</a>';
+    exit;
+}
+
+if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
+
+    $google_hedefadi = $google_hedef_adi == 'root' ? '' : $google_hedef_adi;
+
+    // Kaynak dosya olduğundan dosyayı hedefe yükle
+    $dosya_adi = basename($yerelden_secilen);
+    $existingFile = searchFile($service, $google_hedef_id, $dosya_adi);
+
+    if($existingFile){
+        // Dosya zaten varsa, üzerine yaz
+        $existing_File = new Google_Service_Drive_DriveFile();
+        $service->files->update($existingFile->getId(), $existing_File, array(
+            'data' => $dosya_adi,
+            'mimeType' => mime_content_type($yerelden_secilen),
+            'uploadType' => 'multipart'
+        ));
+        echo "<span style='color: red'>Dosyanın üzerine yazıldı:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }else{
-        if(createDirectoryPath($service, $path, $rootId))
-        {
-            echo "<strong>".basename($path) . "</strong> Dosya Başarıyla Google Drive'a Yüklendi"; // Tek dosya yüklendiğindeki mesaj
-        }
+        // Dosya yoksa, yeni dosya oluştur
+        $fileMetadata = new Google_Service_Drive_DriveFile();
+        $fileMetadata->setName($dosya_adi);
+        $fileMetadata->setParents([$google_hedef_id]);
+        $createdFile = $service->files->create($fileMetadata, [
+            'data' => $dosya_adi,
+            'mimeType' => mime_content_type($yerelden_secilen),
+            'uploadType' => 'multipart',
+        ]);
+        echo "<span style='color: blue;'>Dosya yüklendi:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }
-
+}else{
+    // Kaynak klasör olduğundan fonksiyonu çağırarak dosyaları yükle
+    uploadFolder($service, $google_hedef_id, $yerelden_secilen);
+}
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
 }else
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

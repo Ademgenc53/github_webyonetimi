@@ -299,7 +299,7 @@ function deleteDirectoryRecursive($directory, $ftp) {
 #####################################################################################################################################
 // AŞAĞIDAKİ KOD VERİTABANI VEYA DİZİN ZİP DOSYASI GÖREV İLE GOOGLA YÜKLEME KODU
 if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['google_yedekle']) && $_POST['google_yedekle'] == 1 && isset($_POST['dosya_adi_yolu']) && strlen($_POST['dosya_adi_yolu']) > 1){
-
+/*
     // Upload the file to the specified directory
     // Sadece tek dosya yükleme fonksiyonu
     function insertFile($service, $parentId, $filename) {
@@ -321,7 +321,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['google_yedekle']) && $_
             print "Tek dosya yükleme fonsiyonun da bir hata oluştu: " . $e->getMessage();
         }
     }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
     // Klasör veya Dosya var mı yokmu kontrolu yapan fonksiyon
     function dir_exists($fileid, $service) {
         $folderId = $fileid;
@@ -334,7 +336,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['google_yedekle']) && $_
         }
         return $klasorler_dizi;
     }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
     // Yerelden gelen kaynak klasör ise bu fonksiyondan dizin yolu parçalayıp
     // dizin oluşturmak için bir alttaki fonksiyona gönderiyoruz dosya ise
     // yüklemek için iki üsteki fonksiyona gönderiyoruz
@@ -343,11 +347,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['google_yedekle']) && $_
         $source = str_replace(array(ZIPDIR, BACKUPDIR.'/'), '', $source_selected); //Eğer dizin yolunda BACKUPDIR varsa bu dizini oluşturma
         //$source = str_replace(array('../','./'), '', $source);
         $directories = explode('/', $source);
-/*
-$dosya = fopen ("metin.txt" , "a"); //dosya oluşturma işlemi 
-$yaz = "görev BACKUPDIR varmı\n".print_r($source, true); // Yazmak istediginiz yazı 
-fwrite($dosya,$yaz); fclose($dosya);
-*/
+
             foreach ($directories as $directory) {
                 // Sıradaki döngü "$directory" ile parçalanan dizinin son öğesi ile aynı mı? ve
                 // Tam "$source_selected" kaynağın son öğesi dizin mi 
@@ -380,7 +380,9 @@ fwrite($dosya,$yaz); fclose($dosya);
             }
             return $parentId; // Oluşturulan son klasörün ID si
     }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
     // Bir üsteki fonksiyondan gelecek dizin adı ile dizin oluşturma fonksiyonu
     function createSubdirectory($service, $parentId, $subdirectoryName) {
         $fileMetadata = new Google_Service_Drive_DriveFile(array(
@@ -399,7 +401,9 @@ fwrite($dosya,$yaz); fclose($dosya);
         }
         return null; // Bir şeyler ters giderse null değerini döndür
     }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
 // ÖN DİZİNLER VARSA ÖNCE ÖN DİZİNLERİ OLUŞTURUP SON DİZİN ID SİNİ ALIP O DİZİNE YEDEK YÜKLENMEYE BAŞLANACAK
 function onDizinYolu($service, $path, $parentId = null) {
     $directories = explode('/', $path);
@@ -420,7 +424,8 @@ function onDizinYolu($service, $path, $parentId = null) {
     }
     return $parentId; // The ID of the last folder created
 }
-
+*/
+/*
 function onAltDizinYolu($service, $parentId, $subdirectoryName) {
     $fileMetadata = new Google_Service_Drive_DriveFile(array(
         'name' => $subdirectoryName,
@@ -437,6 +442,7 @@ function onAltDizinYolu($service, $parentId, $subdirectoryName) {
     }
     return null; // Return null if something went wrong
 }
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Yerelden gelen kaynağın önce önündeki ve sonundaki eğik çizgilerini kaldırıyoruz
     // Sonra yerelden gelen kaynağın dizin mi yoksa dosya mı kontrolu yapıyoruz

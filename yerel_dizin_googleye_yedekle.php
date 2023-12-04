@@ -234,7 +234,7 @@ include('includes/footer.php');
                 $.ajax({
                     type: "POST",
                     url: "uzak_sunucuya_dosya_yukleme.php",
-                    data: { googla_yukle: 1, yerel_den_secilen_dosya: yerel_den_secilen_dosya, google_drive_dan_secilen_dosya_id: google_drive_dan_secilen_dosya_id },
+                    data: { googla_yukle: 1, yerel_den_secilen_dosya: yerel_den_secilen_dosya, google_drive_dan_secilen_dosya_id: google_drive_dan_secilen_dosya_id, google_drive_dan_secilen_dosya_adini_goster: google_drive_dan_secilen_dosya_adini_goster },
                     success: function (msg) {
                         $(function () {
                             pen.icerik(msg);
