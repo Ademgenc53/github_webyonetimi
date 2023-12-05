@@ -4,6 +4,7 @@ session_start();
 require_once('includes/connect.php');
 require_once('check-login.php');
 require_once("includes/turkcegunler.php");
+
 if (!(PHP_VERSION_ID >= 80100)) {
     exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Kütüphanesi En Düşük \">= 8.1.0\" PHP sürümünü gerektirir. Siz " . PHP_VERSION . " Çalıştırıyorsunuz.</div>");
 }
@@ -115,9 +116,9 @@ function uploadFolder($service, $parentId, $folderPath) {
 ##################################################################################################################################
 ##################################################################################################################################
 ##################################################################################################################################
-$yerelden_secilen = rtrim($_POST['yerel_den_secilen_dosya'], '/');
-$google_hedef_id = $_POST['google_drive_dan_secilen_dosya_id'];
-$google_hedef_adi = $_POST['google_drive_dan_secilen_dosya_adini_goster'];
+$yerelden_secilen   = rtrim($_POST['yerel_den_secilen_dosya'], '/');
+$google_hedef_id    = $_POST['google_drive_dan_secilen_dosya_id'];
+$google_hedef_adi   = $_POST['google_drive_dan_secilen_dosya_adini_goster'];
 
 try {
     searchFile($service, $google_hedef_id, $google_hedef_adi);
@@ -172,11 +173,9 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
 }else if(isset($_POST['ftpye_yukle']) && $_POST['ftpye_yukle'] == '1' && isset($_POST['yerel_den_secilen_dosya']) && !empty($_POST['yerel_den_secilen_dosya']) && isset($_POST['ftp_den_secilen_dosya']) && !empty($_POST['ftp_den_secilen_dosya']))
 {
 
-
 $ftp_server = $genel_ayarlar['sunucu'];
 $ftp_user   = $genel_ayarlar['username'];
 $ftp_pass   = $genel_ayarlar['password'];
-
 
 // Bağlantı oluştur
 $conn_id = ftp_ssl_connect($ftp_server);
@@ -221,7 +220,7 @@ function yukleDosyalar($conn_id, $yerel_dizin, $ftp_dizin, $secilen_yol) {
                     $yerel_dosyayolu = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), array($ftp_dizin), $yerel_dosya_yolu);
                     echo "<span style='color: blue;'>Başarılı:</span> ".$ftp_dizin."/".substr($yerel_dosya_yolu, strpos($yerel_dosya_yolu, basename($secilen_yol)), 1000)."<br />";
                 } else {
-                    echo "<span style='color: red;'>Başarısız:</span> ".$ftp_dizin."/".$uzak_dosya_yolu."<br />";
+                    echo "<span style='color: red;'>Başarısız:</span> ".$ftp_dizin."/".substr($yerel_dosya_yolu, strpos($yerel_dosya_yolu, basename($secilen_yol)), 1000)."<br />";
                 }
             }
         }
@@ -245,14 +244,14 @@ if ($login_result) {
         if (ftp_put($conn_id, $ftp_dizin.basename($yerel_dizin), $yerel_dizin, FTP_BINARY)) {
             echo "<span style='color: blue;'>Başarılı:</span> ".$ciktiyolu."<br />";
         } else {
-            echo "<span style='color: red;'>Başarısız:</span> ".$ftp_dizin.basename($yerel_dizin)."<br />";
+            echo "<span style='color: red;'>Başarısız:</span> ".$ciktiyolu."<br />";
         }
     }else{ // Kaynak klasör ise
     $ftp_dizin = ltrim(rtrim($_POST['ftp_den_secilen_dosya'], '/'), '/'); // Seçilen dizin olduğu için ve seçilen dizinide göndermek için basename() ile ftp dizine ekliyoruz
         // FTP sunucuda dizin kontrolü yap
         if (!@ftp_chdir($conn_id, $ftp_dizin."/".basename($yerel_dizin))) {
             // Dizin yoksa oluştur
-            $dizinler = explode('/', $ftp_dizin."/".basename($yerel_dizin));
+            $dizinler = array_filter(explode('/', $ftp_dizin."/".basename($yerel_dizin)));
             foreach ($dizinler as $dizin) {
                 if (!@ftp_chdir($conn_id, $dizin)) {
                     ftp_mkdir($conn_id, $dizin);
