@@ -34,14 +34,12 @@ $service = new Google\Service\Drive($client);
         return $size_in_bytes;
     }
 
-
-
-
     $folderId = isset($_POST['dir']) ? $_POST['dir'] : 'root';
     $results = $service->files->listFiles(array(
         'q' => "'$folderId' in parents",
-	'orderBy' => 'name'
+        'orderBy' => 'name'
     ));
+
     $drive_dizinler_arr = [];
     $drive_dosyalar_arr = [];
     foreach ($results->getFiles() as $file) {
@@ -61,28 +59,27 @@ $service = new Google\Service\Drive($client);
         return count($results->getFiles());
     }
 
-			$list = '<ul id="uzak" class="filetree" style="display: none;">';
-			// Önce klasörleri gruplandıralım
-			foreach( $drive_dizinler_arr AS $id => $arr_devam ) {
-                foreach($arr_devam AS $boyutu => $dizin_adi){
-					if( emptyDir($id, $service) == '0' ){ // Dizin boşmu değilmi
-						$list .= '<li class="folder collapsed"><a href="#" rel="' . $id . '" adi="' . $dizin_adi . '">' . $dizin_adi . '<span style="float: right;color: black;padding-right: 10px;">4 KB</span></a></li>';
-					}else{
-						$list .= '<li class="folder_plus collapsed"><a href="#" rel="' . $id . '" adi="' . $dizin_adi . '">' . $dizin_adi . '<span style="float: right;color: black;padding-right: 10px;">4 KB</span></a></li>';
-					}
-                }
-			}
+    $list = '<ul id="uzak" class="filetree" style="display: none;">';
+    // Önce klasörleri gruplandıralım
+    foreach( $drive_dizinler_arr AS $id => $arr_devam ) {
+        foreach($arr_devam AS $boyutu => $dizin_adi){
+            if( emptyDir($id, $service) == '0' ){ // Dizin boşmu değilmi
+                $list .= '<li class="folder collapsed"><a href="#" rel="' . $id . '" adi="' . $dizin_adi . '">' . $dizin_adi . '<span style="float: right;color: black;padding-right: 10px;">4 KB</span></a></li>';
+            }else{
+                $list .= '<li class="folder_plus collapsed"><a href="#" rel="' . $id . '" adi="' . $dizin_adi . '">' . $dizin_adi . '<span style="float: right;color: black;padding-right: 10px;">4 KB</span></a></li>';
+            }
+        }
+    }
 
-			// Sonra tüm dosyaları gruplandıralım
-			foreach( $drive_dosyalar_arr AS $id => $devam_arr ) {
-                foreach($devam_arr AS $boyutu => $dosya_adi){
-					$ext = preg_replace('/^.*\./', '', $dosya_adi);
-					$list .= '<li class="file ext_' . $ext . '"><a href="#" rel="' . $id . '" adi="' . $dosya_adi . '">' . $dosya_adi . '<span style="float: right;color: black;padding-right: 10px;">'.$boyutu.'</span></a></li>';
-				}
+    // Sonra tüm dosyaları gruplandıralım
+    foreach( $drive_dosyalar_arr AS $id => $devam_arr ) {
+        foreach($devam_arr AS $boyutu => $dosya_adi){
+            $ext = preg_replace('/^.*\./', '', $dosya_adi);
+            $list .= '<li class="file ext_' . $ext . '"><a href="#" rel="' . $id . '" adi="' . $dosya_adi . '">' . $dosya_adi . '<span style="float: right;color: black;padding-right: 10px;">'.$boyutu.'</span></a></li>';
+        }
+    }
 
-			}
-
-			$list .= '</ul>';	
-			echo $list;
+    $list .= '</ul>';	
+    echo $list;
 
 ?>

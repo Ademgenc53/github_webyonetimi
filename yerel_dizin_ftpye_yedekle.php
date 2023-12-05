@@ -207,7 +207,7 @@ include('includes/footer.php');
         function ftp_dur(x) {
             if (x == 1) {
 
-                var pen = jw('d').baslik("FTP'ye yedeklemek").en(750).boy(550).kucultPasif().acEfekt(2, 1000).kapatEfekt(2, 1000).ac();
+                var pen = jw('d').baslik("FTP'ye yedekleme").en(750).boy(550).kucultPasif().acEfekt(2, 1000).kapatEfekt(2, 1000).ac();
                 pen.icerikTD.spin(gif);
 
                 $.ajax({

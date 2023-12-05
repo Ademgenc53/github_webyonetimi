@@ -123,7 +123,7 @@ include('includes/sub_navbar.php');
                 <div class="card-body p-0">
 
     <div class="row">
-        <div class="col-sm-6 p-3"><div class="p-1 bg-primary text-white"><strong>Yerel Web Dizin Zipler</strong></div>
+        <div class="col-sm-6 p-3"><div class="p-1 bg-primary text-white"><strong>Yerel Zipli Web Dizinler</strong></div>
             <div id="yerel_dizin_agac"></div>
             <button type="button" class="btn btn-warning btn-sm" style="margin-top: 15px;" onclick="return yerelOgeleriSil();"><span class="glyphicon glyphicon-trash"></span> Seçilen Öğeyi Sil </button>
         </div>
@@ -207,7 +207,7 @@ include('includes/footer.php');
         function ftp_dur(x) {
             if (x == 1) {
 
-                var pen = jw('d').baslik("FTP'ye yedeklemek").en(750).boy(550).kucultPasif().acEfekt(2, 1000).kapatEfekt(2, 1000).ac();
+                var pen = jw('d').baslik("FTP'ye yedekleme").en(750).boy(550).kucultPasif().acEfekt(2, 1000).kapatEfekt(2, 1000).ac();
                 pen.icerikTD.spin(gif);
 
                 $.ajax({

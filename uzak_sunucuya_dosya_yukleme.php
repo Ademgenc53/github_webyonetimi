@@ -94,7 +94,7 @@ function uploadFolder($service, $parentId, $folderPath) {
                         'uploadType' => 'multipart'
                     ));
                     $cikti_yolu_adi = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), '', $filePath);
-                    echo "<span style='color: red'>Dosyanın üzerine yazıldı:</span> ".$google_hedefadi."/".$cikti_yolu_adi."<br />";
+                    echo "<span style='color: red'>Dosyanın üzerine yazma başarılı:</span> ".$google_hedefadi.$cikti_yolu_adi."<br />";
                 } else {
                     // Dosya yoksa, yeni dosya oluştur
                     $fileMetadata = new Google_Service_Drive_DriveFile();
@@ -106,7 +106,7 @@ function uploadFolder($service, $parentId, $folderPath) {
                         'uploadType' => 'multipart',
                     ]);
                     $cikti_yolu_adi = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), '', $filePath);
-                    echo "<span style='color: blue;'>Dosya yüklendi:</span> ".$google_hedefadi."/".$cikti_yolu_adi."<br />";
+                    echo "<span style='color: blue;'>Başarılı:</span> ".$google_hedefadi.$cikti_yolu_adi."<br />";
                 }
             }
         }
@@ -144,7 +144,7 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
             'mimeType' => mime_content_type($yerelden_secilen),
             'uploadType' => 'multipart'
         ));
-        echo "<span style='color: red'>Dosyanın üzerine yazıldı:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
+        echo "<span style='color: red'>Dosyanın üzerine yazma başarılı:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }else{
         // Dosya yoksa, yeni dosya oluştur
         $fileMetadata = new Google_Service_Drive_DriveFile();
@@ -155,7 +155,7 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
             'mimeType' => mime_content_type($yerelden_secilen),
             'uploadType' => 'multipart',
         ]);
-        echo "<span style='color: blue;'>Dosya yüklendi:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
+        echo "<span style='color: blue;'>Başarılı:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }
 }else{
     // Kaynak klasör olduğundan fonksiyonu çağırarak dosyaları yükle
@@ -169,43 +169,21 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
 ##################################################################################################################################
 ##################################################################################################################################
 ##################################################################################################################################
-}else
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-if(isset($_POST['ftpye_yukle']) && $_POST['ftpye_yukle'] == '1' && isset($_POST['yerel_den_secilen_dosya']) && !empty($_POST['yerel_den_secilen_dosya']) && isset($_POST['ftp_den_secilen_dosya']) && !empty($_POST['ftp_den_secilen_dosya']))
+}else if(isset($_POST['ftpye_yukle']) && $_POST['ftpye_yukle'] == '1' && isset($_POST['yerel_den_secilen_dosya']) && !empty($_POST['yerel_den_secilen_dosya']) && isset($_POST['ftp_den_secilen_dosya']) && !empty($_POST['ftp_den_secilen_dosya']))
 {
 
-//r10.net fatal
-    $ftp_directory = "";
 
-    $ftpsunucu      =  $genel_ayarlar['sunucu'];
-    $ftpusername    =  $genel_ayarlar['username'];
-    $ftppass        =  $genel_ayarlar['password'];
+$ftp_server = $genel_ayarlar['sunucu'];
+$ftp_user   = $genel_ayarlar['username'];
+$ftp_pass   = $genel_ayarlar['password'];
 
-    // Yerelden kaynak dosya değişkene alıyoruz
-    $yuklenecek_dizin_veya_dosya = $_POST['yerel_den_secilen_dosya'];
-    // Yerelden kaynak dosya mı klasör mu kontrol ediyoruz
-    if(is_dir($yuklenecek_dizin_veya_dosya)){
-        $ftp_directory = "/".str_replace(BACKUPDIR.'/', '', $yuklenecek_dizin_veya_dosya); // Dizi yolundaki BACKUPDIR dizin yüklenmesi diye çıkarıyoruz
-    }else{
-        $ftp_directory = "/".str_replace(BACKUPDIR.'/', '', $yuklenecek_dizin_veya_dosya); // Dizi yolundaki BACKUPDIR dizin yüklenmesi diye çıkarıyoruz
-    }
 
-    $ftp = @ftp_ssl_connect($ftpsunucu)
-            or die($ftpsunucu . " sunucuya bağlanamadı");
-    $login_result = ftp_login($ftp, $ftpusername, $ftppass);
-    ftp_pasv($ftp, true);
+// Bağlantı oluştur
+$conn_id = ftp_ssl_connect($ftp_server);
 
-    if((!$ftp) || (!$login_result))
-    {
-        echo "FTP'ye bağlanamıyorum!";
-        die();
-    }
+// Giriş yap
+$login_result = ftp_login($conn_id, $ftp_user, $ftp_pass);
+ftp_pasv($conn_id, true);
 
 function ftp_mksubdirs($ftp,$ftpbasedir,$ftpath){
    @ftp_chdir($ftp, $ftpbasedir); // /var/www/uploads sunucudaki dizin yani başlama dizin ancak biz null girdik
@@ -218,84 +196,84 @@ function ftp_mksubdirs($ftp,$ftpbasedir,$ftpath){
       }
    }
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function yukleDosyalar($conn_id, $yerel_dizin, $ftp_dizin, $secilen_yol) {
 
-function kaynakKlasoruOku($directory_name) {
+    $dosyalar = scandir($yerel_dizin);
 
-  global $current_directory,$full_directory,$ftp_directory,$ftp,$basarili,$arrow,$basarisiz;
+    foreach ($dosyalar as $dosya) {
+        if ($dosya != '.' && $dosya != '..') {
+            $yerel_dosya_yolu = $yerel_dizin ."/". $dosya;
+            $uzak_dosya_yolu = $dosya;
 
-    if(!empty($ftp_directory)){
-        ftp_mksubdirs($ftp,null,$ftp_directory);
-    }
- 
-  chdir($directory_name."/"); // PHP'nin geçerli dizinden belirtilen dizin'e geçmesini sağlar. 
-  $directory  =  opendir(".");
+            if (is_dir($yerel_dosya_yolu)) {
+                // Eğer bir dizinse, önce o dizine geç ve ardından dosyaları yükle
+                if (!@ftp_chdir($conn_id, $uzak_dosya_yolu)) {
+                    ftp_mkdir($conn_id, $uzak_dosya_yolu);
+                    ftp_chdir($conn_id, $uzak_dosya_yolu);
+                }
+                yukleDosyalar($conn_id, $yerel_dosya_yolu, $ftp_dizin, $secilen_yol);
+                ftp_chdir($conn_id, '..');
 
-  while($row = readdir($directory)) {
-    if ($row != '.' and $row != '..' and $row != "Thumbs.db") {
-        $tamyol = "$directory_name/$row";
-
-        $lokalkla = str_replace("".$current_directory."/","",$directory_name)."";
-        $lokaldosya = "$lokalkla/$row";
-        $ftp_upload = str_replace(array("\\\\","/"),array("/","/"),"$ftp_directory".str_replace("".$full_directory."","",$directory_name)."/$row");
-
-        if(!is_dir($row)) {
-            $yükleme = @ftp_put($ftp, $ftp_upload, $tamyol, FTP_BINARY); // FTP ile dosyaları uzak sunucuya yükler
-
-          if ($yükleme) {
-
-          }else{
-
-          }
-        }else{
-            // Gönderilen dizin ise önce dizin oluşturuyoruz
-            // Eğer aynı dizin varsa }else{ ile dizin oluşturmayı atlıyoruz ve dosyaları yüklüyoruz
-            if(@ftp_mkdir($ftp, $ftp_upload)){
-                ftp_chmod($ftp, 0755, $ftp_upload);    
-                ftp_chdir($ftp, $ftp_upload);
-                kaynakKlasoruOku("$directory_name/$row");
-                chdir($directory_name."/");
-                //fls();
-            }else{
-                kaynakKlasoruOku("$directory_name/$row");
-                chdir($directory_name."/");             
+            } else {
+                // Eğer bir dosyaysa, dosyayı yükle
+                if (ftp_put($conn_id, $uzak_dosya_yolu, $yerel_dosya_yolu, FTP_BINARY)) {
+                    $yerel_dosyayolu = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), array($ftp_dizin), $yerel_dosya_yolu);
+                    echo "<span style='color: blue;'>Başarılı:</span> ".$ftp_dizin."/".substr($yerel_dosya_yolu, strpos($yerel_dosya_yolu, basename($secilen_yol)), 1000)."<br />";
+                } else {
+                    echo "<span style='color: red;'>Başarısız:</span> ".$ftp_dizin."/".$uzak_dosya_yolu."<br />";
+                }
             }
         }
     }
-  }
-  closedir ($directory);
-} // function kaynakKlasoruOku($directory_name) {
+}
 
-    $current_directory = getcwd();
-    $full_directory = $current_directory."/$yuklenecek_dizin_veya_dosya";
+if ($login_result) {
+    //echo "FTP sunucusuna başarıyla bağlandı ve giriş yapıldı.<br><br>";
+    $yerel_dizin = rtrim($_POST['yerel_den_secilen_dosya'], '/');
 
-    // Gönderilecek dosya tek dosyasımı kontrol ediyoruz
-    if(!is_dir($yuklenecek_dizin_veya_dosya)){
-/*
-    $uzaksunucudosyayolu = "";
-    if(!empty($ftp_directory)){
-        ftp_mksubdirs($ftp,null,$ftp_directory);
-        $uzaksunucudosyayolu = $ftp_directory."/";
-    }
-*/
-        // Tek seçilen dosyayı yüklemek için
-        $upload = @ftp_put($ftp, basename($yuklenecek_dizin_veya_dosya), $yuklenecek_dizin_veya_dosya, FTP_BINARY); // FTP ile dosyaları uzak sunucuya yükler
-
-        if ($upload) {
-            echo "<div style='font-size: 14px;text-align:center;'><strong>".basename($ftp_directory)."</strong> Dosya Başarıyla FTP'ye Yüklendi</div>";
-        } else {
-            echo "<div style='font-size: 14px;text-align:center;'><strong>".basename($ftp_directory)."</strong> Dosya Bir Hatadan Dolayı FTP'ye Yüklenemedi</div>";
+    // Kaynak dosya ise
+    if(pathinfo($yerel_dizin, PATHINFO_EXTENSION)){
+    // FTP dizinin başında ve sonunda eğik çizgi olmalıdır
+    $ftp_dizin = "/".ltrim(rtrim($_POST['ftp_den_secilen_dosya'], '/'), '/')."/";
+        // FTP den dizin seçildi ise ve oluşturmayan dizin varsa önce oluştur
+        if($ftp_dizin != '/'){
+            ftp_mksubdirs($conn_id,null,$ftp_dizin);
         }
-        
-    }else if(is_dir($yuklenecek_dizin_veya_dosya)){
-
-        kaynakKlasoruOku($full_directory);
-        echo "<div style='font-size: 14px;text-align:center;'><strong>".basename($ftp_directory)."</strong> Dizin Başarıyla FTP'ye Yüklendi</div>";
+        // Eğer bir dosyaysa, dosyayı yükle
+        $ciktiyolu = ltrim($ftp_dizin.basename($yerel_dizin),'/');
+        if (ftp_put($conn_id, $ftp_dizin.basename($yerel_dizin), $yerel_dizin, FTP_BINARY)) {
+            echo "<span style='color: blue;'>Başarılı:</span> ".$ciktiyolu."<br />";
+        } else {
+            echo "<span style='color: red;'>Başarısız:</span> ".$ftp_dizin.basename($yerel_dizin)."<br />";
+        }
+    }else{ // Kaynak klasör ise
+    $ftp_dizin = ltrim(rtrim($_POST['ftp_den_secilen_dosya'], '/'), '/'); // Seçilen dizin olduğu için ve seçilen dizinide göndermek için basename() ile ftp dizine ekliyoruz
+        // FTP sunucuda dizin kontrolü yap
+        if (!@ftp_chdir($conn_id, $ftp_dizin."/".basename($yerel_dizin))) {
+            // Dizin yoksa oluştur
+            $dizinler = explode('/', $ftp_dizin."/".basename($yerel_dizin));
+            foreach ($dizinler as $dizin) {
+                if (!@ftp_chdir($conn_id, $dizin)) {
+                    ftp_mkdir($conn_id, $dizin);
+                    ftp_chmod($conn_id, 0755, $dizin);
+                    ftp_chdir($conn_id, $dizin);
+                }
+            }
+        }
+        // Yerel dizinindeki dosyaları FTP sunucuya yükle
+        yukleDosyalar($conn_id, $yerel_dizin, $ftp_dizin, $secilen_yol=$yerel_dizin);
+        echo "<b>Tüm dosyalar FTP sunucusuna başarıyla yüklendi</b>";
     }
-    ftp_close($ftp);
+    // Bağlantıyı kapat
+    ftp_close($conn_id);
+} else {
+    echo "FTP sunucusuna bağlanırken bir hata oluştu.<br>";
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 ?>
