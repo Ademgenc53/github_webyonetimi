@@ -276,7 +276,8 @@ code-input textarea, code-input pre {
         <br />Yedek Veritabanı İçeriği Listeleniyor...
     </div>
 
-    <code-input id="sql-listele" style="width:101%;height:500px;display:none;" lang="sql" placeholder="Biraz SQL yazın!" template="demo"></code-input>
+    <span style="padding-left: 10px;">Sadece önizleme, düzenleme yok</span>
+    <code-input id="sql-listele" style="width:101%;height:1000px;display:none;" lang="sql" placeholder="Biraz SQL yazın!" template="demo"></code-input>
 
                 </div><!-- / <div class="card-body p-0"> -->
             </div><!-- / <div class="card"> -->

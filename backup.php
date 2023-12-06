@@ -200,17 +200,17 @@ $lock_read .= ' '.$table.' READ,';
             // Tablo onarımda tabloların kilitlenmesi belirlendi ise kilitliyoruz
             if ($_POST['lock']=='1')
             {
-                $PDOdbsecilen->query("LOCK TABLES ".$table." WRITE");
+                $PDOdbsecilen->query('LOCK TABLES `'.$table.'` WRITE');
             }
 
 			// Check Table
-			$check = $PDOdbsecilen->query(" CHECK TABLE $table ")->fetch(PDO::FETCH_NUM);
+			$check = $PDOdbsecilen->query(' CHECK TABLE `'.$table.'` ')->fetch(PDO::FETCH_NUM);
 
             // Repair Table
-            $repair = $PDOdbsecilen->query(" REPAIR TABLE $table ")->fetch(PDO::FETCH_BOTH);
+            $repair = $PDOdbsecilen->query(' REPAIR TABLE `'.$table.'` ')->fetch(PDO::FETCH_BOTH);
 
             // Optimize Table
-            $optimize = $PDOdbsecilen->query(" OPTIMIZE TABLE $table ")->fetch(PDO::FETCH_BOTH);
+            $optimize = $PDOdbsecilen->query(' OPTIMIZE TABLE `'.$table.'` ')->fetch(PDO::FETCH_BOTH);
 
 
             // Tablo onarımda tabloların kilitlenmesi belirlendi ise kilitlenen tabloların kilidini açıyoruz ki veri dökümü yapılabilsin
@@ -240,9 +240,9 @@ foreach($tables as $table){
 $t++;
 // İlk sutuna göre sıralamak için sutun adlarını alıyoruz
 // Sutun adlarını tek diziye diziyoruz
-$tablonun_sutun_adlari = $PDOdbsecilen->query("DESCRIBE $table")->fetchAll(PDO::FETCH_COLUMN);
+$tablonun_sutun_adlari = $PDOdbsecilen->query("DESCRIBE `$table`")->fetchAll(PDO::FETCH_COLUMN);
 
-$sutun_sayisi = $PDOdbsecilen->query(" SELECT * FROM $table ORDER BY $tablonun_sutun_adlari[0] ASC ");
+$sutun_sayisi = $PDOdbsecilen->query(" SELECT * FROM `$table` ORDER BY $tablonun_sutun_adlari[0] ASC ");
 $num_fields =  $sutun_sayisi->columnCount();
 $numrow = $sutun_sayisi->rowCount();
 
@@ -276,7 +276,7 @@ $return .= "--\n\n";
 // Tablo yapısının başına "DROP TABLE IF EXISTS tabloadı" ekliyoruz ki geri yüklerken tablo varsa önce silsin diye
 $return .= "DROP TABLE IF EXISTS {$table};";
 
-$pstm2 = $PDOdbsecilen->query("SHOW CREATE TABLE {$table}");
+$pstm2 = $PDOdbsecilen->query("SHOW CREATE TABLE `{$table}` ");
 $row2 = $pstm2->fetch(PDO::FETCH_NUM);
 $ifnotexists = str_replace('CREATE TABLE', 'CREATE TABLE IF NOT EXISTS', $row2[1]);
 // Tablo oluşturma başlığı ve tablo yapısını dosyaya ekliyoruz
@@ -289,7 +289,7 @@ $return .= "--\n\n" ;
         //Tablonun sutün tiplerini alıyoruz ki sayı formatlı mı metin formatlı mı diye
         // Aşağıdaki foreach döngüde kullanacağız
         if ($numrow) {
-            $pstm3 = $PDOdbsecilen->query("SHOW COLUMNS FROM $table");
+            $pstm3 = $PDOdbsecilen->query("SHOW COLUMNS FROM `$table` ");
             $type = array();
 
             while ($rows = $pstm3->fetch(PDO::FETCH_NUM)) {
@@ -303,7 +303,7 @@ $return .= "--\n\n" ;
 ##############################################################################################
 
 ##############################################################################################
-$sutunozellikleri = $PDOdbsecilen->query(" SHOW COLUMNS FROM {$table} ");
+$sutunozellikleri = $PDOdbsecilen->query(" SHOW COLUMNS FROM `{$table}` ");
 $sutun_ozellikleri = $sutunozellikleri->fetchAll(PDO::FETCH_NUM);
 ##############################################################################################
 // Foreach döngü ile veri satırları dosyaya ekliyoruz
