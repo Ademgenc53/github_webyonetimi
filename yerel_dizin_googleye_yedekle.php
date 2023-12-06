@@ -202,9 +202,19 @@ include('includes/footer.php');
         var google_drive_dan_secilen_dosya_adini_goster = $('#google_drive_dan_secilen_dosya_adini_goster').val();
         var dosyami_dizinmi = google_drive_dan_secilen_dosya_adini_goster.replace(/^.*?\.([a-zA-Z0-9]+)$/, "$1");
 
+        function basename(path) {
+            return path.split('/').reverse()[0];
+        }
+
         if (yerel_den_secilen_dosya == '') {
             $(function () {
                 jw("b olumsuz").baslik("Yerelden Kaynak Seçilmedi").icerik("Yerelden bir dosya veya dizin kaynak seçmelisiniz").kilitle().en(450).boy(100).ac();
+            })
+            return false;
+        }
+        if (basename(yerel_den_secilen_dosya) == '.htaccess') {
+            $(function () {
+                jw("b olumsuz").baslik("Bu Dosya Yüklenemez").icerik("<b>.htaccess</b> dosya tek başına yüklenemez.<br />Dizin içinde olduğunda dizinle beraber yüklenebilir").kilitle().en(450).boy(100).ac();
             })
             return false;
         }
