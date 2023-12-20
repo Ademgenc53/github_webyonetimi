@@ -152,7 +152,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gorevle_google_yedek_si
     //echo '<pre>Dosyalar: ' . print_r($drive_dosyalar_arr, true) . '</pre>';
 
     if(count($drive_dosyalar_arr)>0){
-        while (count($drive_dosyalar_arr) > $row['uzak_sunucu_korunacak_yedek']){
+        while (count($drive_dosyalar_arr) > $row['google_sunucu_korunacak_yedek']){
             $silinendosya = array_pop($drive_dosyalar_arr);
             //echo "<b style='color: red;'>Temsili Silinen dosya: </b>".$silinendosya."<br>";
             try {
@@ -167,7 +167,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['gorevle_google_yedek_si
     }
 
     if(count($drive_dizinler_arr)>0){
-        while (count($drive_dizinler_arr) > $row['uzak_sunucu_korunacak_yedek']){
+        while (count($drive_dizinler_arr) > $row['google_sunucu_korunacak_yedek']){
             $silinendizin = array_pop($drive_dizinler_arr);
             //echo "<b style='color: blue;'>Temsili Silinen klasör: </b>".$silinendizin."<br>";
             try {

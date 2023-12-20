@@ -82,7 +82,7 @@ function deleteDirectoryRecursive($directory, $ftp) {
         }else{
             $uzak_sunucu_ici_dizin_adi = "";
         }
-    if($row['uzak_sunucu_korunacak_yedek'] != '-1'){
+    if($row['ftp_sunucu_korunacak_yedek'] != '-1'){
         $file_list = ftp_mlsd($ftp, $uzak_sunucu_ici_dizin_adi);
 
         $ftpdeki_dosyalar = [];
@@ -127,7 +127,7 @@ function deleteDirectoryRecursive($directory, $ftp) {
 */
 
     if(count($ftpdeki_dosyalar)>0){
-        while (count($ftpdeki_dosyalar) > $row['uzak_sunucu_korunacak_yedek']){
+        while (count($ftpdeki_dosyalar) > $row['ftp_sunucu_korunacak_yedek']){
             $silinendosya = array_pop($ftpdeki_dosyalar);
             $dosya_tarihi = substr($silinendosya, strpos($silinendosya, $row['secilen_yedekleme_oneki']."-") + strlen($row['secilen_yedekleme_oneki']."-"), 19);
             if(validateDate($dosya_tarihi)){
@@ -138,7 +138,7 @@ function deleteDirectoryRecursive($directory, $ftp) {
     }
 
     if(count($ftpdeki_dizinler)>0){
-        while (count($ftpdeki_dizinler) > $row['uzak_sunucu_korunacak_yedek']){
+        while (count($ftpdeki_dizinler) > $row['ftp_sunucu_korunacak_yedek']){
             $silinendizin = array_pop($ftpdeki_dizinler);
             $dizin_tarihi = substr($silinendizin, -19);
             if(validateDate($dizin_tarihi)){
@@ -148,9 +148,9 @@ function deleteDirectoryRecursive($directory, $ftp) {
         }
     }
 
-    //echo '<pre>Dosyalar: '.$row['uzak_sunucu_korunacak_yedek'].'<br>' . print_r($ftpdeki_dosyalar, true) . '</pre>';
-    //echo '<pre>Dizinler: '.$row['uzak_sunucu_korunacak_yedek'].'<br>' . print_r($ftpdeki_dizinler, true) . '</pre>';
-    } // if($row['uzak_sunucu_korunacak_yedek'] != '-1'){
+    //echo '<pre>Dosyalar: '.$row['ftp_sunucu_korunacak_yedek'].'<br>' . print_r($ftpdeki_dosyalar, true) . '</pre>';
+    //echo '<pre>Dizinler: '.$row['ftp_sunucu_korunacak_yedek'].'<br>' . print_r($ftpdeki_dizinler, true) . '</pre>';
+    } // if($row['ftp_sunucu_korunacak_yedek'] != '-1'){
 
         //} // while ($row = $gorevler->fetch()) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

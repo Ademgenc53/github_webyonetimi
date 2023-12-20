@@ -248,7 +248,7 @@ fwrite($dosya,$yaz); fclose($dosya);
             "ftp_yedekle"                   =>  1,
             "ftpsonrakidizin"               =>  $row['uzak_sunucu_ici_dizin_adi'],
             "dosya_adi_yolu"                =>  $cikis_sonucu['dosya_adi'],
-            "uzak_sunucu_korunacak_yedek"   =>  $row['uzak_sunucu_korunacak_yedek']
+            "ftp_sunucu_korunacak_yedek"    =>  $row['ftp_sunucu_korunacak_yedek']
         );
 
         $ftp_ch = curl_init();
@@ -272,11 +272,11 @@ fwrite($dosya,$yaz); fclose($dosya);
         $ftpsilurl = $protocol."://".$_SERVER['SERVER_NAME']."/ftp_yedek_sil.php";
 
         $ftpsil_arr = array(
-            "id"                    => $row['id'],
-            "ftp_yedekle"           =>  1,
-            "ftpsonrakidizin"       =>  $row['uzak_sunucu_ici_dizin_adi'],
-            "dosya_adi_yolu"        =>  $cikis_sonucu['dosya_adi'],
-            "uzak_sunucu_korunacak_yedek"   =>  $row['uzak_sunucu_korunacak_yedek']
+            "id"                            => $row['id'],
+            "ftp_yedekle"                   =>  1,
+            "ftpsonrakidizin"               =>  $row['uzak_sunucu_ici_dizin_adi'],
+            "dosya_adi_yolu"                =>  $cikis_sonucu['dosya_adi'],
+            "ftp_sunucu_korunacak_yedek"    =>  $row['ftp_sunucu_korunacak_yedek']
         );
 
         $ftpsil_ch = curl_init();
@@ -314,7 +314,7 @@ fwrite($dosya,$yaz); fclose($dosya);
             "google_yedekle"                =>  1,
             "uzak_sunucu_ici_dizin_adi"     =>  $row['uzak_sunucu_ici_dizin_adi'],
             "dosya_adi_yolu"                =>  $cikis_sonucu['dosya_adi'],
-            "uzak_sunucu_korunacak_yedek"   =>  $row['uzak_sunucu_korunacak_yedek'],
+            "google_sunucu_korunacak_yedek" =>  $row['google_sunucu_korunacak_yedek'],
             "elle_yurutme"                  =>  isset($_POST['elle_yurutme']) ? $_POST['elle_yurutme'] : ""
         );
 
@@ -349,7 +349,7 @@ fwrite($dosya,$yaz); fclose($dosya);
             "gorevle_google_yedek_sil"      =>  1,
             "uzak_sunucu_ici_dizin_adi"     =>  $row['uzak_sunucu_ici_dizin_adi'],
             "dosya_adi_yolu"                =>  $cikis_sonucu['dosya_adi'],
-            "uzak_sunucu_korunacak_yedek"   =>  $row['uzak_sunucu_korunacak_yedek']
+            "google_sunucu_korunacak_yedek" =>  $row['google_sunucu_korunacak_yedek']
         );
 
         $googlesil_ch = curl_init();
@@ -519,7 +519,7 @@ fwrite($dosya,$yaz); fclose($dosya);
                 "ftp_yedekle"                   =>  1,
                 "ftpsonrakidizin"               =>  $row['uzak_sunucu_ici_dizin_adi'],
                 "dosya_adi_yolu"                =>  $cikis_sonucu['dosya_adi'],
-                "uzak_sunucu_korunacak_yedek"   =>  $row['uzak_sunucu_korunacak_yedek']
+                "ftp_sunucu_korunacak_yedek"    =>  $row['ftp_sunucu_korunacak_yedek']
             );
 
             $ftp_ch = curl_init();
@@ -547,7 +547,7 @@ fwrite($dosya,$yaz); fclose($dosya);
             "ftp_yedekle"                   =>  1,
             "ftpsonrakidizin"               =>  $row['uzak_sunucu_ici_dizin_adi'],
             "dosya_adi_yolu"                =>  $cikis_sonucu['dosya_adi'],
-            "uzak_sunucu_korunacak_yedek"   =>  $row['uzak_sunucu_korunacak_yedek']
+            "ftp_sunucu_korunacak_yedek"    =>  $row['ftp_sunucu_korunacak_yedek']
         );
 
         $ftpsil_ch = curl_init();
@@ -585,7 +585,7 @@ fwrite($dosya,$yaz); fclose($dosya);
             "google_yedekle"                =>  1,
             "uzak_sunucu_ici_dizin_adi"     =>  $row['uzak_sunucu_ici_dizin_adi'],
             "dosya_adi_yolu"                =>  $cikis_sonucu['dosya_adi'],
-            "uzak_sunucu_korunacak_yedek"   =>  $row['uzak_sunucu_korunacak_yedek']
+            "google_sunucu_korunacak_yedek" =>  $row['google_sunucu_korunacak_yedek']
         );
 
         $google_ch = curl_init();
@@ -618,7 +618,7 @@ fwrite($dosya,$yaz); fclose($dosya);
             "gorevle_google_yedek_sil"      =>  1,
             "uzak_sunucu_ici_dizin_adi"     =>  $row['uzak_sunucu_ici_dizin_adi'],
             "dosya_adi_yolu"                =>  $cikis_sonucu['dosya_adi'],
-            "uzak_sunucu_korunacak_yedek"   =>  $row['uzak_sunucu_korunacak_yedek']
+            "google_sunucu_korunacak_yedek" =>  $row['google_sunucu_korunacak_yedek']
         );
 
         $googlesil_ch = curl_init();

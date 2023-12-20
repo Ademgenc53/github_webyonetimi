@@ -615,70 +615,73 @@ x x -SEÇILEN GÜN BUGÜN DEĞIL ISE SONRAKI GÜNE VE SAAT XX DAKIKA XX KAYDET
         // Ekleme ve güncelleme için
         if(is_array($_POST['haftanin_gunu']) AND array_intersect($haftadizi, $_POST['haftanin_gunu'])){$gun = '-1';}
         if(is_array($_POST['haftanin_gunu']) AND in_array('-1', $_POST['haftanin_gunu'])){$gun = $_POST['gun'];}
-        $gorev_adi                  = $_POST['gorev_adi'];
-        $dosya_adi                  = $_POST['dosya_adi'];
+        $gorev_adi                      = $_POST['gorev_adi'];
+        $dosya_adi                      = $_POST['dosya_adi'];
 
-        $haftanin_gunu              = implode(",", $_POST['haftanin_gunu']);
+        $haftanin_gunu                  = implode(",", $_POST['haftanin_gunu']);
 
-        $saat                       = $_POST['saat'];
-        $dakika                     = $_POST['dakika'];
-        $aktif                      = $_POST['aktif'];
-        $gunluk_kayit               = $_POST['gunluk_kayit'];
+        $saat                           = $_POST['saat'];
+        $dakika                         = $_POST['dakika'];
+        $aktif                          = $_POST['aktif'];
+        $gunluk_kayit                   = $_POST['gunluk_kayit'];
 
-        $gz                         = isset($_POST['gz']) ? $_POST['gz'] : '-1';
-        $dbbakim                    = isset($_POST['dbbakim']) ? $_POST['dbbakim'] : '-1';
-        $dblock                     = isset($_POST['dblock']) ? $_POST['dblock'] : '-1';
-        $combine                    = isset($_POST['combine']) ? $_POST['combine'] : '-1';
-        $elle                       = isset($_POST['elle']) ? $_POST['elle'] : '-1';
+        $gz                             = isset($_POST['gz']) ? $_POST['gz'] : '-1';
+        $dbbakim                        = isset($_POST['dbbakim']) ? $_POST['dbbakim'] : '-1';
+        $dblock                         = isset($_POST['dblock']) ? $_POST['dblock'] : '-1';
+        $combine                        = isset($_POST['combine']) ? $_POST['combine'] : '-1';
+        $elle                           = isset($_POST['elle']) ? $_POST['elle'] : '-1';
         if(isset($_POST['tablolar']) && is_array($_POST['tablolar'])){
-        $tablolar                   = implode(",", $_POST['tablolar']);
+        $tablolar                       = implode(",", $_POST['tablolar']);
         }else{
-        $tablolar                   = NULL;
+        $tablolar                       = NULL;
         }
-        $duzeltilecek_id            = isset($_POST['duzelt_id']) ? $_POST['duzelt_id'] : null;
+        $duzeltilecek_id                = isset($_POST['duzelt_id']) ? $_POST['duzelt_id'] : null;
 
     ###########################################################################################################################
     if(isset($_POST['gorev_nedir']) && $_POST['gorev_nedir'] == 1)
     {
-        $yedekleme_gorevi           = $_POST['gorev_nedir'];
-        $secilen_yedekleme          = isset($_POST['veritabani_secilen_yedekleme']) ? $_POST['veritabani_secilen_yedekleme'] : null;
-        $secilen_yedekleme_oneki    = isset($_POST['veritabani_secilen_yedekleme_oneki']) ? trim($_POST['veritabani_secilen_yedekleme_oneki']) : null;
-        $uzak_sunucu_korunacak_yedek        = isset($_POST['veritabani_ftp_korunacak_yedek']) ? $_POST['veritabani_ftp_korunacak_yedek'] : '-1';
-        $yerel_korunacak_yedek            = isset($_POST['veritabani_korunacak_yedek']) ? $_POST['veritabani_korunacak_yedek'] : '-1';
+        $yedekleme_gorevi               = $_POST['gorev_nedir'];
+        $secilen_yedekleme              = isset($_POST['veritabani_secilen_yedekleme']) ? $_POST['veritabani_secilen_yedekleme'] : null;
+        $secilen_yedekleme_oneki        = isset($_POST['veritabani_secilen_yedekleme_oneki']) ? trim($_POST['veritabani_secilen_yedekleme_oneki']) : null;
+        $google_sunucu_korunacak_yedek  = isset($_POST['veritabani_google_korunacak_yedek']) ? $_POST['veritabani_google_korunacak_yedek'] : '-1';
+        $ftp_sunucu_korunacak_yedek     = isset($_POST['veritabani_ftp_korunacak_yedek']) ? $_POST['veritabani_ftp_korunacak_yedek'] : '-1';
+        $yerel_korunacak_yedek          = isset($_POST['veritabani_korunacak_yedek']) ? $_POST['veritabani_korunacak_yedek'] : '-1';
         // dizin yolunun başında ve veya sonunda / eğik çizgi varsa kaldırır
         if(isset($_POST['veritabani_ftp_ici_dizin_adi']) && !empty($_POST['veritabani_ftp_ici_dizin_adi'])){
-            $uzak_sunucu_ici_dizin_adi      = preg_replace('/^\/+|\/+$/', '', $_POST['veritabani_ftp_ici_dizin_adi']); // dizin yolunun başında ve veya sonunda / eğik çizgi varsa kaldırır
+            $uzak_sunucu_ici_dizin_adi  = preg_replace('/^\/+|\/+$/', '', $_POST['veritabani_ftp_ici_dizin_adi']); // dizin yolunun başında ve veya sonunda / eğik çizgi varsa kaldırır
         }else{
-            $uzak_sunucu_ici_dizin_adi      = null;
+            $uzak_sunucu_ici_dizin_adi  = null;
         }
-        $ftp_yedekle                = isset($_POST['veritabani_ftp_yedekle']) ? $_POST['veritabani_ftp_yedekle'] : 0;
-        $google_yedekle             = isset($_POST['veritabani_google_yedekle']) ? $_POST['veritabani_google_yedekle'] : 0;
+        $ftp_yedekle                    = isset($_POST['veritabani_ftp_yedekle']) ? $_POST['veritabani_ftp_yedekle'] : 0;
+        $google_yedekle                 = isset($_POST['veritabani_google_yedekle']) ? $_POST['veritabani_google_yedekle'] : 0;
     }
     elseif(isset($_POST['gorev_nedir']) && $_POST['gorev_nedir'] == 2)
     {
-        $yedekleme_gorevi           = $_POST['gorev_nedir'];
-        $secilen_yedekleme          = isset($_POST['dizin_secilen_yedekleme']) ? $_POST['dizin_secilen_yedekleme'] : null;
-        $secilen_yedekleme_oneki    = isset($_POST['dizin_secilen_yedekleme_oneki']) ? trim($_POST['dizin_secilen_yedekleme_oneki']) : null;
-        $uzak_sunucu_korunacak_yedek        = isset($_POST['dizin_ftp_korunacak_yedek']) ? $_POST['dizin_ftp_korunacak_yedek'] : '-1';
-        $yerel_korunacak_yedek            = isset($_POST['dizin_korunacak_yedek']) ? $_POST['dizin_korunacak_yedek'] : '-1';
+        $yedekleme_gorevi               = $_POST['gorev_nedir'];
+        $secilen_yedekleme              = isset($_POST['dizin_secilen_yedekleme']) ? $_POST['dizin_secilen_yedekleme'] : null;
+        $secilen_yedekleme_oneki        = isset($_POST['dizin_secilen_yedekleme_oneki']) ? trim($_POST['dizin_secilen_yedekleme_oneki']) : null;
+        $google_sunucu_korunacak_yedek  = isset($_POST['dizin_google_korunacak_yedek']) ? $_POST['dizin_google_korunacak_yedek'] : '-1';
+        $ftp_sunucu_korunacak_yedek     = isset($_POST['dizin_ftp_korunacak_yedek']) ? $_POST['dizin_ftp_korunacak_yedek'] : '-1';
+        $yerel_korunacak_yedek          = isset($_POST['dizin_korunacak_yedek']) ? $_POST['dizin_korunacak_yedek'] : '-1';
         // dizin yolunun başında ve veya sonunda / eğik çizgi varsa kaldırır
         if(isset($_POST['dizin_ftp_ici_dizin_adi']) && !empty($_POST['dizin_ftp_ici_dizin_adi'])){
-            $uzak_sunucu_ici_dizin_adi      = preg_replace('/^\/+|\/+$/', '', $_POST['dizin_ftp_ici_dizin_adi']); // dizin yolunun başında ve veya sonunda / eğik çizgi varsa kaldırır
+            $uzak_sunucu_ici_dizin_adi  = preg_replace('/^\/+|\/+$/', '', $_POST['dizin_ftp_ici_dizin_adi']); // dizin yolunun başında ve veya sonunda / eğik çizgi varsa kaldırır
         }else{
-            $uzak_sunucu_ici_dizin_adi      = null;
+            $uzak_sunucu_ici_dizin_adi  = null;
         }
-        $ftp_yedekle                = isset($_POST['dizin_ftp_yedekle']) ? $_POST['dizin_ftp_yedekle'] : 0;
-        $google_yedekle             = isset($_POST['dizin_google_yedekle']) ? $_POST['dizin_google_yedekle'] : 0;
+        $ftp_yedekle                    = isset($_POST['dizin_ftp_yedekle']) ? $_POST['dizin_ftp_yedekle'] : 0;
+        $google_yedekle                 = isset($_POST['dizin_google_yedekle']) ? $_POST['dizin_google_yedekle'] : 0;
     }
     elseif(isset($_POST['gorev_nedir']) && $_POST['gorev_nedir'] == 3)
     {
-        $yedekleme_gorevi           = $_POST['gorev_nedir'];
-        $secilen_yedekleme          = null;
-        $secilen_yedekleme_oneki    = null;
-        $uzak_sunucu_korunacak_yedek        = '-1';
-        $yerel_korunacak_yedek            = '-1';
-        $uzak_sunucu_ici_dizin_adi          = null;
-        $ftp_yedekle                = 0;
+        $yedekleme_gorevi               = $_POST['gorev_nedir'];
+        $secilen_yedekleme              = null;
+        $secilen_yedekleme_oneki        = null;
+        $google_sunucu_korunacak_yedek  = '-1';
+        $ftp_sunucu_korunacak_yedek     = '-1';
+        $yerel_korunacak_yedek          = '-1';
+        $uzak_sunucu_ici_dizin_adi      = null;
+        $ftp_yedekle                    = 0;
     }
 ###########################################################################################################################
 
@@ -700,7 +703,8 @@ x x -SEÇILEN GÜN BUGÜN DEĞIL ISE SONRAKI GÜNE VE SAAT XX DAKIKA XX KAYDET
         ftp_yedekle,
         google_yedekle,
         uzak_sunucu_ici_dizin_adi,
-        uzak_sunucu_korunacak_yedek,
+        google_sunucu_korunacak_yedek,
+        ftp_sunucu_korunacak_yedek,
         secilen_yedekleme_oneki,
         yerel_korunacak_yedek,
         gz,
@@ -724,7 +728,8 @@ x x -SEÇILEN GÜN BUGÜN DEĞIL ISE SONRAKI GÜNE VE SAAT XX DAKIKA XX KAYDET
         :ftp_yedekle,
         :google_yedekle,
         :uzak_sunucu_ici_dizin_adi,
-        :uzak_sunucu_korunacak_yedek,
+        :google_sunucu_korunacak_yedek,
+        :ftp_sunucu_korunacak_yedek,
         :secilen_yedekleme_oneki,
         :yerel_korunacak_yedek,
         :gz,
@@ -748,7 +753,8 @@ x x -SEÇILEN GÜN BUGÜN DEĞIL ISE SONRAKI GÜNE VE SAAT XX DAKIKA XX KAYDET
             $ftvtk->bindValue(':ftp_yedekle', $ftp_yedekle, PDO::PARAM_INT);
             $ftvtk->bindValue(':google_yedekle', $google_yedekle, PDO::PARAM_INT);
             $ftvtk->bindValue(':uzak_sunucu_ici_dizin_adi', $uzak_sunucu_ici_dizin_adi, PDO::PARAM_INT);
-            $ftvtk->bindValue(':uzak_sunucu_korunacak_yedek', $uzak_sunucu_korunacak_yedek, PDO::PARAM_INT);
+            $ftvtk->bindValue(':google_sunucu_korunacak_yedek', $google_sunucu_korunacak_yedek, PDO::PARAM_INT);
+            $ftvtk->bindValue(':ftp_sunucu_korunacak_yedek', $ftp_sunucu_korunacak_yedek, PDO::PARAM_INT);
             $ftvtk->bindValue(':secilen_yedekleme_oneki', $secilen_yedekleme_oneki, PDO::PARAM_STR);
             $ftvtk->bindValue(':yerel_korunacak_yedek', $yerel_korunacak_yedek, PDO::PARAM_INT);
             $ftvtk->bindValue(':gz', $gz, PDO::PARAM_INT);
@@ -792,7 +798,8 @@ x x -SEÇILEN GÜN BUGÜN DEĞIL ISE SONRAKI GÜNE VE SAAT XX DAKIKA XX KAYDET
         ftp_yedekle = :ftp_yedekle,
         google_yedekle = :google_yedekle,
         uzak_sunucu_ici_dizin_adi = :uzak_sunucu_ici_dizin_adi,
-        uzak_sunucu_korunacak_yedek = :uzak_sunucu_korunacak_yedek,
+        google_sunucu_korunacak_yedek = :google_sunucu_korunacak_yedek,
+        ftp_sunucu_korunacak_yedek = :ftp_sunucu_korunacak_yedek,
         secilen_yedekleme_oneki = :secilen_yedekleme_oneki,
         yerel_korunacak_yedek = :yerel_korunacak_yedek,
         gz = :gz,
@@ -818,7 +825,8 @@ x x -SEÇILEN GÜN BUGÜN DEĞIL ISE SONRAKI GÜNE VE SAAT XX DAKIKA XX KAYDET
         $ftvtk->bindValue(':ftp_yedekle', $ftp_yedekle, PDO::PARAM_INT);
         $ftvtk->bindValue(':google_yedekle', $google_yedekle, PDO::PARAM_INT);
         $ftvtk->bindValue(':uzak_sunucu_ici_dizin_adi', $uzak_sunucu_ici_dizin_adi, PDO::PARAM_INT);
-        $ftvtk->bindValue(':uzak_sunucu_korunacak_yedek', $uzak_sunucu_korunacak_yedek, PDO::PARAM_INT);
+        $ftvtk->bindValue(':google_sunucu_korunacak_yedek', $google_sunucu_korunacak_yedek, PDO::PARAM_INT);
+        $ftvtk->bindValue(':ftp_sunucu_korunacak_yedek', $ftp_sunucu_korunacak_yedek, PDO::PARAM_INT);
         $ftvtk->bindValue(':secilen_yedekleme_oneki', $secilen_yedekleme_oneki, PDO::PARAM_STR);
         $ftvtk->bindValue(':yerel_korunacak_yedek', $yerel_korunacak_yedek, PDO::PARAM_INT);
         $ftvtk->bindValue(':gz', $gz, PDO::PARAM_INT);
@@ -1393,14 +1401,34 @@ include('includes/sub_navbar.php');
     </tr>
 
     <tr>
-        <td colspan="2">Uzak Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
+        <td colspan="2">Google Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
+        <td colspan="4" style="padding: 0rem 0.75rem 0rem 0.75rem;vertical-align: middle;">
+        <select class="form-control" name="dizin_google_korunacak_yedek" id="dizin_google_korunacak_yedek" style="width:350px;">
+            <option value="-1">Hiç Birini Silme</option>
+                <?php
+                for ($x = 1; $x < 11; $x++)
+                {
+                    if($editrow['google_sunucu_korunacak_yedek'] == $x){
+                        echo "<option value=\"$x\" selected>Son $x yedeği koru</option>\n";
+                    }else{
+                        echo "<option value=\"$x\">Son $x yedeği koru</option>\n";
+                    }
+                }
+                ?>
+            </select>
+        </td>
+        <td colspan="2">Otomatik yedeklenen web dizin son kaç yedeği silmekten korunacak? "<b>Hiç Birini Silme</b>" seçeneği silme işlemi gerçekleştirmez.</td>
+    </tr>
+
+    <tr>
+        <td colspan="2">FTP Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
         <td colspan="4" style="padding: 0rem 0.75rem 0rem 0.75rem;vertical-align: middle;">
         <select class="form-control" name="dizin_ftp_korunacak_yedek" id="dizin_ftp_korunacak_yedek" style="width:350px;">
             <option value="-1">Hiç Birini Silme</option>
                 <?php
                 for ($x = 1; $x < 11; $x++)
                 {
-                    if($editrow['uzak_sunucu_korunacak_yedek'] == $x){
+                    if($editrow['ftp_sunucu_korunacak_yedek'] == $x){
                         echo "<option value=\"$x\" selected>Son $x yedeği koru</option>\n";
                     }else{
                         echo "<option value=\"$x\">Son $x yedeği koru</option>\n";
@@ -1493,12 +1521,31 @@ include('includes/sub_navbar.php');
     </tr>
 
     <tr>
-        <td colspan="2">Uzak Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
+        <td colspan="2">Google Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
+        <td colspan="4" style="padding: 0rem 0.75rem 0rem 0.75rem;vertical-align: middle;">
+        <select class="form-control" name="veritabani_google_korunacak_yedek" id="veritabani_google_korunacak_yedek" style="width:350px;">
+            <?php 
+            $sayidizi = array(-1,1,2,3,4,5,6,7,8,9,10);
+            $secili = $editrow['google_sunucu_korunacak_yedek'];
+            foreach($sayidizi AS $x)
+            {
+            $selected = $x == $secili ? ' selected="selected"' : '';
+            $xx = $x == '-1' ? 'Hiç Birini Silme' : "Son $x yedeği koru";
+            echo "<option value=\"$x\"$selected>$xx</option>\n";
+            }
+            ?>
+        </select>
+        </td>
+        <td colspan="2">Otomatik yedeklenen veritabanının son kaç yedeği silmekten korunacak? "<b>Hiç Birini Silme</b>" seçeneği silme işlemi gerçekleştirmez.</td>
+    </tr>
+
+    <tr>
+        <td colspan="2">FTP Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
         <td colspan="4" style="padding: 0rem 0.75rem 0rem 0.75rem;vertical-align: middle;">
         <select class="form-control" name="veritabani_ftp_korunacak_yedek" id="veritabani_ftp_korunacak_yedek" style="width:350px;">
             <?php 
             $sayidizi = array(-1,1,2,3,4,5,6,7,8,9,10);
-            $secili = $editrow['uzak_sunucu_korunacak_yedek'];
+            $secili = $editrow['ftp_sunucu_korunacak_yedek'];
             foreach($sayidizi AS $x)
             {
             $selected = $x == $secili ? ' selected="selected"' : '';
@@ -1809,7 +1856,23 @@ include('includes/sub_navbar.php');
     </tr>
 
     <tr>
-        <td colspan="2">Uzak Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
+        <td colspan="2">Google Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
+        <td colspan="4" style="padding: 0rem 0.75rem 0rem 0.75rem;vertical-align: middle;">
+        <select class="form-control" name="dizin_google_korunacak_yedek" id="dizin_google_korunacak_yedek" style="width:350px;">
+            <option value="-1">Hiç Birini Silme</option>
+                <?php
+                for ($x = 1; $x < 11; $x++)
+                {
+                echo "<option value=\"$x\">Son $x yedeği koru</option>\n";
+                }
+                ?>
+            </select>
+        </td>
+        <td colspan="2">Otomatik yedeklenen web dizin son kaç yedeği silmekten korunacak? "<b>Hiç Birini Silme</b>" seçeneği silme işlemi gerçekleştirmez.</td>
+    </tr>
+
+    <tr>
+        <td colspan="2">FTP Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
         <td colspan="4" style="padding: 0rem 0.75rem 0rem 0.75rem;vertical-align: middle;">
         <select class="form-control" name="dizin_ftp_korunacak_yedek" id="dizin_ftp_korunacak_yedek" style="width:350px;">
             <option value="-1">Hiç Birini Silme</option>
@@ -1882,7 +1945,23 @@ include('includes/sub_navbar.php');
     </tr>
 
     <tr>
-        <td colspan="2">Uzak Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
+        <td colspan="2">Google Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
+        <td colspan="4" style="padding: 0rem 0.75rem 0rem 0.75rem;vertical-align: middle;">
+        <select class="form-control" name="veritabani_google_korunacak_yedek" id="veritabani_google_korunacak_yedek" style="width:350px;">
+            <option value="-1">Hiç Birini Silme</option>
+                <?php
+                for ($x = 1; $x < 11; $x++)
+                {
+                echo "<option value=\"$x\">Son $x yedeği koru</option>\n";
+                }
+                ?>
+            </select>
+        </td>
+        <td colspan="2">Otomatik yedeklenen veritabanının son kaç yedeği silmekten korunacak? "<b>Hiç Birini Silme</b>" seçeneği silme işlemi gerçekleştirmez.</td>
+    </tr>
+
+    <tr>
+        <td colspan="2">FTP Sunucudaki Eski Yedeği Silerken Son Kaç Yedek Korunacak</td>
         <td colspan="4" style="padding: 0rem 0.75rem 0rem 0.75rem;vertical-align: middle;">
         <select class="form-control" name="veritabani_ftp_korunacak_yedek" id="veritabani_ftp_korunacak_yedek" style="width:350px;">
             <option value="-1">Hiç Birini Silme</option>
