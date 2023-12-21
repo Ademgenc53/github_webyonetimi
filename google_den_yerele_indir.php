@@ -74,7 +74,7 @@ $service = new Google\Service\Drive($client);
             $content = $service->files->get($fileId, array("alt" => "media"));
         
             // Dosyaları indirelim
-            $handle = fopen($yerel_hedef.$google_kaynak, "w+");
+            $handle = fopen(rtrim($yerel_hedef,'/')."/".$google_kaynak, "w+");
             while (!$content->getBody()->eof()) {
                 fwrite($handle, $content->getBody()->read(1024));
             }
@@ -90,11 +90,11 @@ $service = new Google\Service\Drive($client);
             $filePathsArray = listFiles($secilen_dizin, $service, $fileId);
             $secilen_googleden_secilen_array = array_merge($googleden_secilen_dizin_arr, $filePathsArray);
 
-
+/*
     $dosya = fopen ("metin.txt" , "a"); //dosya oluşturma işlemi 
     $yaz = "görev dosyasından\n".print_r($secilen_googleden_secilen_array, true); // Yazmak istediginiz yazı 
     fwrite($dosya,$yaz); fclose($dosya);
-
+*/
 
             echo "<br /><b>Yerel </b> ".$yerel_hedef." <b>dizine</b><br />";
             foreach($secilen_googleden_secilen_array AS $id => $dosya_tipi_dosya_adi)
