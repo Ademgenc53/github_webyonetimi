@@ -90,9 +90,9 @@ function uploadFolder($service, $parentId, $folderPath) {
                     // Dosya zaten varsa, üzerine yaz
                     $existing_File = new Google_Service_Drive_DriveFile();
                     $service->files->update($existingFile->getId(), $existing_File, array(
-                        'data' => $filePath,
+                        'data' => file_get_contents($filePath),
                         'mimeType' => mime_content_type($filePath),
-                        'uploadType' => 'multipart'
+                        'uploadType' => 'media'
                     ));
                     $cikti_yolu_adi = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), '', $filePath);
                     echo "<span style='color: red'>Dosyanın üzerine yazma başarılı:</span> ".$google_hedefadi.$cikti_yolu_adi."<br />";
@@ -102,9 +102,9 @@ function uploadFolder($service, $parentId, $folderPath) {
                     $fileMetadata->setName($file);
                     $fileMetadata->setParents([$createdFolder->id]);
                     $createdFile = $service->files->create($fileMetadata, [
-                        'data' => $filePath,
+                        'data' => file_get_contents($filePath),
                         'mimeType' => mime_content_type($filePath),
-                        'uploadType' => 'multipart',
+                        'uploadType' => 'media',
                     ]);
                     $cikti_yolu_adi = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), '', $filePath);
                     echo "<span style='color: blue;'>Başarılı:</span> ".$google_hedefadi.$cikti_yolu_adi."<br />";
@@ -141,9 +141,9 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
         // Dosya zaten varsa, üzerine yaz
         $existing_File = new Google_Service_Drive_DriveFile();
         $service->files->update($existingFile->getId(), $existing_File, array(
-            'data' => $dosya_adi,
+            'data' => file_get_contents($yerelden_secilen),
             'mimeType' => mime_content_type($yerelden_secilen),
-            'uploadType' => 'multipart'
+            'uploadType' => 'media'
         ));
         echo "<span style='color: red'>Dosyanın üzerine yazma başarılı:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }else{
@@ -152,9 +152,9 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
         $fileMetadata->setName($dosya_adi);
         $fileMetadata->setParents([$google_hedef_id]);
         $createdFile = $service->files->create($fileMetadata, [
-            'data' => $dosya_adi,
+            'data' => file_get_contents($yerelden_secilen),
             'mimeType' => mime_content_type($yerelden_secilen),
-            'uploadType' => 'multipart',
+            'uploadType' => 'media',
         ]);
         echo "<span style='color: blue;'>Başarılı:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }
@@ -218,9 +218,9 @@ function yukleDosyalar($conn_id, $yerel_dizin, $ftp_dizin, $secilen_yol) {
                 // Eğer bir dosyaysa, dosyayı yükle
                 if (ftp_put($conn_id, $uzak_dosya_yolu, $yerel_dosya_yolu, FTP_BINARY)) {
                     $yerel_dosyayolu = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), array($ftp_dizin), $yerel_dosya_yolu);
-                    echo "<span style='color: blue;'>Başarılı:</span> ".$ftp_dizin."/".substr($yerel_dosya_yolu, strpos($yerel_dosya_yolu, basename($secilen_yol)), 1000)."<br />";
+                    echo "<span style='color: blue;'>Başarılı:</span> ".$ftp_dizin."/".substr($yerel_dosya_yolu, strpos($yerel_dosya_yolu, basename($secilen_yol)), null)."<br />";
                 } else {
-                    echo "<span style='color: red;'>Başarısız:</span> ".$ftp_dizin."/".substr($yerel_dosya_yolu, strpos($yerel_dosya_yolu, basename($secilen_yol)), 1000)."<br />";
+                    echo "<span style='color: red;'>Başarısız:</span> ".$ftp_dizin."/".substr($yerel_dosya_yolu, strpos($yerel_dosya_yolu, basename($secilen_yol)), null)."<br />";
                 }
             }
         }
