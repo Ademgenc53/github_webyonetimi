@@ -4,6 +4,7 @@ session_start();
 require_once('includes/connect.php');
 require_once('check-login.php');
 require_once("includes/turkcegunler.php");
+
 ##########################################################################################################
 
     if(!empty($_SESSION["dizitablolar"])){
@@ -79,7 +80,19 @@ include('includes/sub_navbar.php');
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body p-0">
+<?php 
+    $error = false;
+    if (!(PHP_VERSION_ID >= 80100)) {
+        echo ("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Kütüphanesi En Düşük \">= 8.1.0\" PHP sürümünü gerektirir. Siz " . PHP_VERSION . " Çalıştırıyorsunuz.</div>");
+        $error = true;
+    }
+    if(!file_exists(__DIR__.'/plugins/google_drive/client_json/client_secrets.json')){
+        echo ("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Hesap Bilgileri içeren \"client_secrets.json\" dosyası mevcut değil</div>");
+        $error = true;
+    }
 
+    if(!$error){
+?>
     <form method="POST">
     <div class="row">
         <div class="col-sm-12 p-3 text-center">
@@ -108,7 +121,7 @@ include('includes/sub_navbar.php');
         <button type="button" class="btn btn-success btn-sm" onclick="javascript:uzakSunucudanIndir();"><i class="fa fa-download" aria-hidden="true"></i> Seçilen Yedeği İndir </button>
     </div>
     </form>
-
+<?php } ?>
                 </div><!-- / <div class="card-body p-0"> -->
             </div><!-- / <div class="card"> -->
         </div><!-- / <div class="col-sm-12"> -->
@@ -124,7 +137,9 @@ include('includes/sub_navbar.php');
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body p-0">
-
+<?php 
+if(!$error){
+?>
     <div class="row">
         <div class="col-sm-6 p-3"><div class="p-1 bg-primary text-white"><strong>Google Drive'daki Yedekler</strong></div>
             <div id="google_drive_uzaktan_agac"></div>
@@ -135,7 +150,7 @@ include('includes/sub_navbar.php');
             <button type="button" class="btn btn-warning btn-sm" style="margin-top: 15px;" onclick="return yerelOgeleriSil();"><span class="glyphicon glyphicon-trash"></span> Seçilen Öğeyi Sil </button>
         </div>
     </div>
-
+<?php } ?>
                 </div><!-- / <div class="card-body p-0"> -->
             </div><!-- / <div class="card"> -->
         </div><!-- / <div class="col-sm-12"> -->
@@ -201,7 +216,7 @@ var gif =
 
         $(function()
             {
-            jw('b secim',ftp_dur).baslik("FTP'den İndirmeyi Onayla").icerik("Google Drive'da seçilen yedek<br />Yerel bölümde seçilen alana<br />indirmek istediğinizden emin misiniz?").en(450).kilitle().ac();
+            jw('b secim',ftp_dur).baslik("Google Drive'dan İndirmeyi Onayla").icerik("Google Drive'da seçilen yedek<br />Yerel bölümde seçilen alana<br />indirmek istediğinizden emin misiniz?").en(450).kilitle().ac();
             })
               
         function ftp_dur(x){

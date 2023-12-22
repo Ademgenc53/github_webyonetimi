@@ -4,23 +4,11 @@ session_start();
 require_once('includes/connect.php');
 require_once('check-login.php');
 require_once("includes/turkcegunler.php");
-if (!(PHP_VERSION_ID >= 80100)) {
-    exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Kütüphanesi En Düşük \">= 8.1.0\" PHP sürümünü gerektirir. Siz " . PHP_VERSION . " Çalıştırıyorsunuz.</div>");
-}
-if(!file_exists(__DIR__.'/plugins/google_drive/client_json/client_secrets.json')){
-exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Hesap Bilgileri içeren \"client_secrets.json\" dosyası mevcut değil</div>");
-}
-require_once __DIR__.'/plugins/google_drive/vendor/autoload.php';
 
 ob_start();
 ini_set('memory_limit', '-1');
 ignore_user_abort(true);
 set_time_limit(3600); //7200 saniye 120 dakikadır, 3600 1 saat
-
-$client = new Google\Client();
-$client->setAuthConfig('plugins/google_drive/client_json/client_secrets.json');
-$client->addScope(Google\Service\Drive::DRIVE);
-$service = new Google\Service\Drive($client);
 
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     echo '<pre>' . print_r($_POST, true) . '</pre>';
@@ -95,7 +83,19 @@ include('includes/sub_navbar.php');
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body p-0">
+<?php 
+    $error = false;
+    if (!(PHP_VERSION_ID >= 80100)) {
+        echo ("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Kütüphanesi En Düşük \">= 8.1.0\" PHP sürümünü gerektirir. Siz " . PHP_VERSION . " Çalıştırıyorsunuz.</div>");
+        $error = true;
+    }
+    if(!file_exists(__DIR__.'/plugins/google_drive/client_json/client_secrets.json')){
+        echo ("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Hesap Bilgileri içeren \"client_secrets.json\" dosyası mevcut değil</div>");
+        $error = true;
+    }
 
+    if(!$error){
+?>
     <form method="POST">
     <div class="row">
         <div class="col-sm-12 p-3 text-center">
@@ -125,7 +125,7 @@ include('includes/sub_navbar.php');
         <button type="button" class="btn btn-success btn-sm" onclick="javascript:uzakSunucuyaYukle();"><i class="fa fa-upload" aria-hidden="true"></i> Google Drive'a Yükle </button>
     </div>
     </form>
-
+<?php } ?>
                 </div><!-- / <div class="card-body p-0"> -->
             </div><!-- / <div class="card"> -->
         </div><!-- / <div class="col-sm-12"> -->
@@ -142,7 +142,9 @@ include('includes/sub_navbar.php');
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body p-0">
-
+<?php 
+if(!$error){
+?>
     <div class="row">
         <div class="col-sm-6 p-3"><div class="p-1 bg-primary text-white"><strong>Yerel Web Dizinler</strong></div>
             <div id="yerel_dizin_agac"></div>
@@ -153,7 +155,7 @@ include('includes/sub_navbar.php');
             <button type="button" class="btn btn-warning btn-sm" style="margin-top: 15px;" onclick="return googleDriveSil();"><span class="glyphicon glyphicon-trash"></span> Seçilen Öğeyi Sil </button>
         </div>
     </div>
-
+<?php } ?>
                 </div><!-- / <div class="card-body p-0"> -->
             </div><!-- / <div class="card"> -->
         </div><!-- / <div class="col-sm-12"> -->
