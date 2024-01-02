@@ -1,6 +1,8 @@
 <?php 
 // Bismillahirrahmanirrahim
 require_once('check-login.php');
+ini_set('memory_limit', '256M');
+
 if(!file_exists(__DIR__.'/plugins/google_drive/client_json/client_secrets.json')){
 exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Hesap Bilgileri içeren \"client_secrets.json\" dosyası mevcut değil</div>");
 }

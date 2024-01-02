@@ -702,7 +702,7 @@ fwrite($dosya,$yaz); fclose($dosya);
 
         //echo '<pre>' . print_r($url, true) . '</pre>';
         $output_array = [];
-        $output_array = json_decode( $cikti[1], JSON_UNESCAPED_SLASHES );
+        $output_array = json_decode( $cikti[1] ?? [], JSON_UNESCAPED_SLASHES );
 
         $gorev_adi = $row['gorev_adi'];
         $calistirilan_dosya = $row['dosya_adi'];                                          

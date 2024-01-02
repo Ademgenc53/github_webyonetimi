@@ -3,6 +3,8 @@
 require_once('includes/connect.php');
 require_once('check-login.php');
 require_once("includes/turkcegunler.php");
+ini_set('memory_limit', '256M');
+
 
     //echo '<pre>' . print_r($_POST, true) . '</pre>';
     //exit;

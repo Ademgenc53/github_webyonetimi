@@ -15,7 +15,7 @@ exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-famil
 require_once __DIR__.'/plugins/google_drive/vendor/autoload.php';
 
 ob_start();
-ini_set('memory_limit', '-1');
+ini_set('memory_limit', '256M');
 ignore_user_abort(true);
 set_time_limit(3600); //7200 saniye 120 dakikadır, 3600 1 saat
 
