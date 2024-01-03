@@ -6,7 +6,7 @@ require_once('check-login.php');
 require_once("includes/turkcegunler.php");
 
 ob_start();
-ini_set('memory_limit', '256M');
+ini_set('memory_limit', '-1');
 ignore_user_abort(true);
 set_time_limit(3600); //7200 saniye 120 dakikadır, 3600 1 saat
 
