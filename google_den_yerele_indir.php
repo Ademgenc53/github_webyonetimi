@@ -72,7 +72,7 @@ $service = new Google\Service\Drive($client);
 
         // Googleden seçilen kaynak dosya ise
         if(pathinfo($google_kaynak, PATHINFO_EXTENSION)){
-
+/*
             $content = $service->files->get($fileId, array("alt" => "media"));
         
             // Dosyaları indirelim
@@ -84,6 +84,48 @@ $service = new Google\Service\Drive($client);
 
             echo "<br /><b>Yerel </b> ".$yerel_hedef." <b>dizine</b><br />";
             echo $google_kaynak." <b>[KOPYALANDI]</b>";
+*/
+
+        // "Büyük Dosya"yı kontrol edin ve dosya kimliğini ve boyutunu ekleyin
+        // Dosyanın ID'sini belirleyin
+
+        // Dosyanın boyutunu ve kimliğini belirleyin
+
+        $file = $service->files->get($fileId, ['fields' => 'id,size']);
+
+        $fileSize = intval($file->size);
+
+        // Yetkili Guzzle HTTP istemcisini edinin
+        $http = $client->authorize();
+
+        // Yazmak için bir dosya açın
+        $fp = fopen(rtrim($yerel_hedef,'/')."/".$google_kaynak, 'w');
+
+        // 1 MB'lık parçalar halinde indirin
+        $chunkSizeBytes = 1 * 1024 * 1024;
+        $chunkStart = 0;
+
+        // Her parçayı yineleyin ve dosyamıza yazın
+        while ($chunkStart < $fileSize) {
+            $chunkEnd = $chunkStart + $chunkSizeBytes;
+            $response = $http->request(
+                'GET',
+                sprintf('/drive/v3/files/%s', $fileId),
+                [
+                    'query' => ['alt' => 'media'],
+                    'headers' => [
+                    'Range' => sprintf('bytes=%s-%s', $chunkStart, $chunkEnd)
+                    ]
+                ]
+            );
+            $chunkStart = $chunkEnd + 1;
+            fwrite($fp, $response->getBody()->getContents());
+        }
+
+        // Dosya işaretçisini kapat
+        fclose($fp);
+
+
 
         }else{ // Googleden seçilen dizin ise
             // Googleden seçilen dizin adını diziye eklemek için fonksiyona gönderiyoruz

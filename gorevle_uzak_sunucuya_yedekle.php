@@ -451,15 +451,68 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
 
     if($existingFile){
         // Dosya zaten varsa, üzerine yaz
+/*
         $existing_File = new Google_Service_Drive_DriveFile();
         $service->files->update($existingFile->getId(), $existing_File, array(
             'data' => file_get_contents($yerelden_secilen),
             'mimeType' => mime_content_type($yerelden_secilen),
             'uploadType' => 'media'
         ));
+*/
+        // Google Drive API'ye gönderilecek dosya nesnesini oluşturuyoruz.
+        $file = new Google\Service\Drive\DriveFile();
+        $file->name = $dosya_adi;
+        $chunkSizeBytes = 1 * 1024 * 1024;
+
+        // API'yi çağırıyoruz, ancak hemen yanıt almak yerine erteliyoruz.
+        $client->setDefer(true);
+        //$request = $service->files->create($file);
+
+        // Dosya yüklememizi temsil eden bir medya dosya yüklemesi oluşturuyoruz.
+        $media = new Google\Http\MediaFileUpload(
+            $client,
+            $service->files->update($existingFile->getId(), $file),
+            'text/plain',
+            null,
+            true,
+            $chunkSizeBytes
+        );
+        $media->setFileSize(filesize($yerelden_secilen));
+
+        // Dosya okuma işlemi için kullanılan fonksiyon
+        function readVideoChunk($handle, $chunkSize)
+        {
+            $byteCount = 0;
+            $giantChunk = "";
+            while (!feof($handle)) {
+                // fread, okuma tamponlu ve düz bir dosyayı temsil etmiyorsa asla 8192 byte'dan fazla veri döndürmez
+                $chunk = fread($handle, 8192);
+                $byteCount += strlen($chunk);
+                $giantChunk .= $chunk;
+                if ($byteCount >= $chunkSize) {
+                    return $giantChunk;
+                }
+            }
+            return $giantChunk;
+        }
+
+        // Farklı parçaları yüklüyoruz. İşlem tamamlandıkça $status değeri false olacaktır.
+        $status = false;
+        $handle = fopen($yerelden_secilen, "rb");
+        while (!$status && !feof($handle)) {
+            // $yerelden_secilen'den $chunkSizeBytes kadar oku
+            $chunk = readVideoChunk($handle, $chunkSizeBytes);
+            $status = $media->nextChunk($chunk);
+        }
+
+        // $status'un nihai değeri, yüklenen nesnenin API'den gelen verileri olacaktır.
+        $result = $status;
+        fclose($handle);
+
         //echo "<span style='color: red'>Dosyanın üzerine yazıldı:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }else{
         // Dosya yoksa, yeni dosya oluştur
+/*
         $fileMetadata = new Google_Service_Drive_DriveFile();
         $fileMetadata->setName($dosya_adi);
         $fileMetadata->setParents([$google_hedef_id]);
@@ -468,6 +521,59 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
             'mimeType' => mime_content_type($yerelden_secilen),
             'uploadType' => 'media',
         ]);
+*/
+        // Dosya yoksa, yeni dosya oluştur
+        // Google Drive API'ye gönderilecek dosya nesnesini oluşturuyoruz.
+        $file = new Google\Service\Drive\DriveFile();
+        $file->name = $dosya_adi;
+        $file->setParents([$google_hedef_id]);
+        $chunkSizeBytes = 1 * 1024 * 1024;
+
+        // API'yi çağırıyoruz, ancak hemen yanıt almak yerine erteliyoruz.
+        $client->setDefer(true);
+        $request = $service->files->create($file);
+
+        // Dosya yüklememizi temsil eden bir medya dosya yüklemesi oluşturuyoruz.
+        $media = new Google\Http\MediaFileUpload(
+            $client,
+            $request,
+            'text/plain',
+            null,
+            true,
+            $chunkSizeBytes
+        );
+        $media->setFileSize(filesize($yerelden_secilen));
+
+        // Dosya okuma işlemi için kullanılan fonksiyon
+        function readVideoChunk($handle, $chunkSize)
+        {
+            $byteCount = 0;
+            $giantChunk = "";
+            while (!feof($handle)) {
+                // fread, okuma tamponlu ve düz bir dosyayı temsil etmiyorsa asla 8192 byte'dan fazla veri döndürmez
+                $chunk = fread($handle, 8192);
+                $byteCount += strlen($chunk);
+                $giantChunk .= $chunk;
+                if ($byteCount >= $chunkSize) {
+                    return $giantChunk;
+                }
+            }
+            return $giantChunk;
+        }
+
+        // Farklı parçaları yüklüyoruz. İşlem tamamlandıkça $status değeri false olacaktır.
+        $status = false;
+        $handle = fopen($yerelden_secilen, "rb");
+        while (!$status && !feof($handle)) {
+            // $yerelden_secilen'den $chunkSizeBytes kadar oku
+            $chunk = readVideoChunk($handle, $chunkSizeBytes);
+            $status = $media->nextChunk($chunk);
+        }
+
+        // $status'un nihai değeri, yüklenen nesnenin API'den gelen verileri olacaktır.
+        $result = $status;
+        fclose($handle);
+        
         //echo "<span style='color: blue;'>Dosya yüklendi:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }
     echo "<span>Google Drive Sunucusuna Başarıyla Yedeklendi</span>";
