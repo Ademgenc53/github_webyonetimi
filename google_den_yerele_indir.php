@@ -72,24 +72,6 @@ $service = new Google\Service\Drive($client);
 
         // Googleden seçilen kaynak dosya ise
         if(pathinfo($google_kaynak, PATHINFO_EXTENSION)){
-/*
-            $content = $service->files->get($fileId, array("alt" => "media"));
-        
-            // Dosyaları indirelim
-            $handle = fopen(rtrim($yerel_hedef,'/')."/".$google_kaynak, "w+");
-            while (!$content->getBody()->eof()) {
-                fwrite($handle, $content->getBody()->read(1024));
-            }
-            fclose($handle);
-
-            echo "<br /><b>Yerel </b> ".$yerel_hedef." <b>dizine</b><br />";
-            echo $google_kaynak." <b>[KOPYALANDI]</b>";
-*/
-
-        // "Büyük Dosya"yı kontrol edin ve dosya kimliğini ve boyutunu ekleyin
-        // Dosyanın ID'sini belirleyin
-
-        // Dosyanın boyutunu ve kimliğini belirleyin
 
         $file = $service->files->get($fileId, ['fields' => 'id,size']);
 
@@ -125,7 +107,8 @@ $service = new Google\Service\Drive($client);
         // Dosya işaretçisini kapat
         fclose($fp);
 
-
+        echo "<br /><b>Yerel </b> ".$yerel_hedef." <b>dizine</b><br />";
+        echo $google_kaynak." <b>[KOPYALANDI]</b>";
 
         }else{ // Googleden seçilen dizin ise
             // Googleden seçilen dizin adını diziye eklemek için fonksiyona gönderiyoruz
