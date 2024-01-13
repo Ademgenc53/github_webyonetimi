@@ -1,24 +1,27 @@
 <?php 
 // Bismillahirrahmanirrahim
+session_start();
+require_once('includes/connect.php');
 require_once('check-login.php');
-ini_set('memory_limit', '-1');
-
-if (!(PHP_VERSION_ID >= 80100)) {
-    exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Kütüphanesi En Düşük \">= 8.1.0\" PHP sürümünü gerektirir. Siz " . PHP_VERSION . " Çalıştırıyorsunuz.</div>");
-}
-if(!file_exists(__DIR__.'/plugins/google_drive/client_json/client_secrets.json')){
-exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Hesap Bilgileri içeren \"client_secrets.json\" dosyası mevcut değil</div>");
-}
-require_once __DIR__.'/plugins/google_drive/vendor/autoload.php';
-
+require_once("includes/turkcegunler.php");
 
 ob_start();
 ini_set('memory_limit', '-1');
 ignore_user_abort(true);
 set_time_limit(3600); //7200 saniye 120 dakikadır, 3600 1 saat
 
+if (!(PHP_VERSION_ID >= 80100)) {
+    exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Kütüphanesi En Düşük \">= 8.1.0\" PHP sürümünü gerektirir. Siz " . PHP_VERSION . " Çalıştırıyorsunuz.</div>");
+}
+
+if (!file_exists($authConfigPath)) {
+    die('Hata: AuthConfig dosyası bulunamadı.');
+}
+
+require_once __DIR__.'/plugins/google_drive/vendor/autoload.php';
+
 $client = new Google\Client();
-$client->setAuthConfig('plugins/google_drive/client_json/client_secrets.json');
+$client->setAuthConfig($authConfigPath);
 $client->addScope(Google\Service\Drive::DRIVE);
 $service = new Google\Service\Drive($client);
 
@@ -73,21 +76,23 @@ $service = new Google\Service\Drive($client);
         // Googleden seçilen kaynak dosya ise
         if(pathinfo($google_kaynak, PATHINFO_EXTENSION)){
 
+        // İndilecek dosyanın ID si ile dosya bilgilerini alıyoruz
         $file = $service->files->get($fileId, ['fields' => 'id,size']);
 
+        // Dosya boyutunu alıyoruz
         $fileSize = intval($file->size);
 
-        // Yetkili Guzzle HTTP istemcisini edinin
+        // Yetkili Guzzle HTTP istemcisini edinelim
         $http = $client->authorize();
 
-        // Yazmak için bir dosya açın
+        // Yerel yol ve indirilen dosya adını belirleyelim
         $fp = fopen(rtrim($yerel_hedef,'/')."/".$google_kaynak, 'w');
 
-        // 1 MB'lık parçalar halinde indirin
+        // 1 MB'lık parçalar halinde indirelim
         $chunkSizeBytes = 1 * 1024 * 1024;
         $chunkStart = 0;
 
-        // Her parçayı yineleyin ve dosyamıza yazın
+        // Her parçayı yineleyerek dosyamıza yazalım
         while ($chunkStart < $fileSize) {
             $chunkEnd = $chunkStart + $chunkSizeBytes;
             $response = $http->request(
@@ -103,12 +108,11 @@ $service = new Google\Service\Drive($client);
             $chunkStart = $chunkEnd + 1;
             fwrite($fp, $response->getBody()->getContents());
         }
-
-        // Dosya işaretçisini kapat
+        // Dosya işaretçisini kapatalım
         fclose($fp);
 
         echo "<br /><b>Yerel </b> ".$yerel_hedef." <b>dizine</b><br />";
-        echo $google_kaynak." <b>[KOPYALANDI]</b>";
+        echo $google_kaynak." <b>[İNDİRİLDİ]</b>";
 
         }else{ // Googleden seçilen dizin ise
             // Googleden seçilen dizin adını diziye eklemek için fonksiyona gönderiyoruz
@@ -124,6 +128,7 @@ $service = new Google\Service\Drive($client);
 */
 
             echo "<br /><b>Yerel </b> ".$yerel_hedef." <b>dizine</b><br />";
+            // Önce tüm yerel dizinleri oluşturalım
             foreach($secilen_googleden_secilen_array AS $id => $dosya_tipi_dosya_adi)
             {
                 foreach($dosya_tipi_dosya_adi AS $dosya_tipi => $dosya_adi)
@@ -141,17 +146,54 @@ $service = new Google\Service\Drive($client);
                 foreach($dosya_tipi_dosya_adi AS $dosya_tipi => $dosya_adi)
                 {
                     if( $dosya_tipi != 'application/vnd.google-apps.folder' ){
+/*
                         $content = $service->files->get($id, array("alt" => "media"));
                         // Dosyaları indirelim
                         $handle = fopen($yerel_hedef.$dosya_adi, "w+");
                         while (!$content->getBody()->eof()) {
                             fwrite($handle, $content->getBody()->read(1024));
                         }
-                            echo $dosya_adi." <b>[KOPYALANDI]</b><br />";
+*/
+                        // İndilecek dosyanın ID si ile dosya bilgilerini alıyoruz
+                        $file = $service->files->get($id, ['fields' => 'id,size']);
+
+                        // Dosya boyutunu alıyoruz
+                        $fileSize = intval($file->size);
+
+                        // Yetkili Guzzle HTTP istemcisini edinelim
+                        $http = $client->authorize();
+
+                        // Yerel yol ve indirilen dosya adını belirleyelim
+                        $fp = fopen($yerel_hedef.$dosya_adi, 'w');
+
+                        // 1 MB'lık parçalar halinde indirelim
+                        $chunkSizeBytes = 1 * 1024 * 1024;
+                        $chunkStart = 0;
+
+                        // Her parçayı yineleyerek dosyamıza yazalım
+                        while ($chunkStart < $fileSize) {
+                            $chunkEnd = $chunkStart + $chunkSizeBytes;
+                            $response = $http->request(
+                                'GET',
+                                sprintf('/drive/v3/files/%s', $id),
+                                [
+                                    'query' => ['alt' => 'media'],
+                                    'headers' => [
+                                    'Range' => sprintf('bytes=%s-%s', $chunkStart, $chunkEnd)
+                                    ]
+                                ]
+                            );
+                            $chunkStart = $chunkEnd + 1;
+                            fwrite($fp, $response->getBody()->getContents());
+                        }
+                        // Dosya işaretçisini kapatalım
+                        fclose($fp);
+
+                        echo $dosya_adi." <b>[İNDİRİLDİ]</b><br />";
                     }
                 }
             }
-            fclose($handle);
+            // fclose($handle);
         }
 
     }else{

@@ -5,22 +5,23 @@ require_once('includes/connect.php');
 require_once('check-login.php');
 require_once("includes/turkcegunler.php");
 
-if (!(PHP_VERSION_ID >= 80100)) {
-    exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Kütüphanesi En Düşük \">= 8.1.0\" PHP sürümünü gerektirir. Siz " . PHP_VERSION . " Çalıştırıyorsunuz.</div>");
-}
-
-if(!file_exists(__DIR__.'/plugins/google_drive/client_json/client_secrets.json')){
-exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Hesap Bilgileri içeren \"client_secrets.json\" dosyası mevcut değil</div>");
-}
-require_once __DIR__.'/plugins/google_drive/vendor/autoload.php';
-
 ob_start();
 ini_set('memory_limit', '-1');
 ignore_user_abort(true);
 set_time_limit(3600); //7200 saniye 120 dakikadır, 3600 1 saat
 
+if (!(PHP_VERSION_ID >= 80100)) {
+    exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Kütüphanesi En Düşük \">= 8.1.0\" PHP sürümünü gerektirir. Siz " . PHP_VERSION . " Çalıştırıyorsunuz.</div>");
+}
+
+if (!file_exists($authConfigPath)) {
+    die('Hata: AuthConfig dosyası bulunamadı.');
+}
+
+require_once __DIR__.'/plugins/google_drive/vendor/autoload.php';
+
 $client = new Google\Client();
-$client->setAuthConfig('plugins/google_drive/client_json/client_secrets.json');
+$client->setAuthConfig($authConfigPath);
 $client->addScope(Google\Service\Drive::DRIVE);
 $service = new Google\Service\Drive($client);
 
@@ -37,35 +38,86 @@ if(isset($_POST['googla_yukle']) && $_POST['googla_yukle'] == '1' && isset($_POS
 
 ##################################################################################################################################
 ##################################################################################################################################
-// Belirli bir klasörde dosya arama
-function searchFile($service, $parentId, $fileName) {
-    $results = $service->files->listFiles([
-        'q' => "name='".$fileName."' and '".$parentId."' in parents",
-    ]);
+##################################################################################################################################
+// Dosya mevcut mu kontrol ediyoruz. Mevcut ise ID sini alıyoruz
+function isFile($parentId, $fileName) {
 
-    if (count($results->getFiles()) > 0) {
+GLOBAL $authConfigPath;
+$client = new Google\Client();
+$client->setAuthConfig($authConfigPath);
+$client->addScope(Google\Service\Drive::DRIVE);
+$service = new Google\Service\Drive($client);
+
+    $results = $service->files->listFiles([
+        'q' => "name='" . $fileName . "' and '" . $parentId . "' in parents",
+    ]);
+/*
+$dosya = fopen ("metin2.txt" , "a"); //dosya oluşturma işlemi 
+$yaz = "isFile\n".print_r($results, true); // Yazmak istediginiz yazı 
+fwrite($dosya,$yaz); fclose($dosya);
+*/
+    // Dosya bulunamadıysa false döndür
+    if (count($results->getFiles())==0) {
+        return false;
+    }
+
+    $file = $results->getFiles()[0];
+    // Dosya türüne göre kontrol et. Klasör değil ise sonucu döndür
+    if($file->getMimeType() !== 'application/vnd.google-apps.folder'){
         return $results->getFiles()[0];
-    } else {
-        return null;
+    }
+}
+##################################################################################################################################
+// Klasör mevcut mu kontrol ediyoruz. Mevcut ise ID sini alıyoruz
+function isFolder($parentId, $fileName) {
+
+GLOBAL $authConfigPath;
+$client = new Google\Client();
+$client->setAuthConfig($authConfigPath);
+$client->addScope(Google\Service\Drive::DRIVE);
+$service = new Google\Service\Drive($client);
+
+    $results = $service->files->listFiles([
+        'q' => "name='" . $fileName . "' and '" . $parentId . "' in parents",
+    ]);
+/*
+$dosya = fopen ("metin.txt" , "a"); //dosya oluşturma işlemi 
+$yaz = "isFolder\n".print_r($results, true); // Yazmak istediginiz yazı 
+fwrite($dosya,$yaz); fclose($dosya);
+*/
+    // Dosya bulunamadıysa false döndür
+    if (count($results->getFiles())==0) {
+        return false;
+    }
+    $file = $results->getFiles()[0];
+    // Dosya türüne göre kontrol et, Klasör ise sonucu döndür
+    if($file->getMimeType() === 'application/vnd.google-apps.folder'){
+        return $results->getFiles()[0];
     }
 }
 ##################################################################################################################################
 ##################################################################################################################################
-##################################################################################################################################
-// Klasör ve alt içerikleri yükleme fonksiyonu
-function uploadFolder($service, $parentId, $folderPath) {
-    GLOBAL $google_hedef_adi;
+// Klasör ve tüm alt-klasörler ve dosyaları google drive a yükle
+function uploadFolder($parentId, $folderPath) {
+
+GLOBAL $authConfigPath, $google_hedef_adi;
+$client = new Google\Client();
+$client->setAuthConfig($authConfigPath);
+$client->addScope(Google\Service\Drive::DRIVE);
+$service = new Google\Service\Drive($client);
+
     $google_hedefadi = $google_hedef_adi == 'root' ? '' : $google_hedef_adi;
     $folderName = basename($folderPath);
 
-    // Klasörün mevcut olup olmadığını kontrol et
-    $existingFolder = searchFile($service, $parentId, $folderName);
+    // Klasörün mevcut olup olmadığını kontrol ediyoruz
+    $existingFolder = isFolder($parentId, $folderName);
 
+    // Klasör mevcut ise klasör ID sini alıyoruz
     if ($existingFolder) {
         $createdFolder = $existingFolder;
     } else {
-        // Klasörü oluştur
-        $folder = new Google_Service_Drive_DriveFile();
+        // Klasör mevcut değil ise yeni klasör oluşturuyoruz
+        $folder = new Google\Service\Drive\DriveFile();
         $folder->setName($folderName);
         $folder->setMimeType('application/vnd.google-apps.folder');
         $folder->setParents([$parentId]);
@@ -73,48 +125,101 @@ function uploadFolder($service, $parentId, $folderPath) {
         $createdFolder = $service->files->create($folder);
     }
 
-    // Klasör içindeki dosyaları yükle
+    $dosyalar_array = [];
+    // Lokal Klasörün içindeki dosyaları google drive'a okuyarak yüklüyoruz
     $files = scandir($folderPath);
-    foreach ($files as $file) {
-        if ($file != '.' && $file != '..') {
-            $filePath = $folderPath . '/' . $file;
+    foreach ($files as $dosya_adi) {
+        if ($dosya_adi != '.' && $dosya_adi != '..') {
+            $filePath = $folderPath . '/' . $dosya_adi;
 
             if (is_dir($filePath)) {
                 // Eğer dosya bir klasör ise, alt klasörü yükle
-                uploadFolder($service, $createdFolder->id, $filePath);
+                uploadFolder($createdFolder->id, $filePath);
             } else {
                 // Eğer dosya bir dosya ise, dosyayı yükle
-                $existingFile = searchFile($service, $createdFolder->id, $file);
 
-                if ($existingFile) {
-                    // Dosya zaten varsa, üzerine yaz
-                    $existing_File = new Google_Service_Drive_DriveFile();
-                    $service->files->update($existingFile->getId(), $existing_File, array(
-                        'data' => file_get_contents($filePath),
-                        'mimeType' => mime_content_type($filePath),
-                        'uploadType' => 'media'
-                    ));
-                    $cikti_yolu_adi = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), '', $filePath);
-                    echo "<span style='color: red'>Dosyanın üzerine yazma başarılı:</span> ".$google_hedefadi.$cikti_yolu_adi."<br />";
-                } else {
-                    // Dosya yoksa, yeni dosya oluştur
-                    $fileMetadata = new Google_Service_Drive_DriveFile();
-                    $fileMetadata->setName($file);
-                    $fileMetadata->setParents([$createdFolder->id]);
+                // Dosya mecut mu kontrol ediyorum
+                $existingFile = isFile($createdFolder->id, $dosya_adi);
 
-                    $createdFile = $service->files->create($fileMetadata, [
-                        'data' => file_get_contents($filePath),
-                        'mimeType' => mime_content_type($filePath),
-                        'uploadType' => 'media',
-                    ]);
+// Sonuca göre sıradaki dosyayı yüklemeye başlıyoruz
+#########################################################################################
+    // Google Drive API'ye gönderilecek dosya nesnesini oluşturuyoruz.
+    $file = new Google\Service\Drive\DriveFile();
+    $file->name = $dosya_adi;
+// Dosya mevcut değil ise yenin dosyanın yükleneceği klasörün ID sini belirtiyoruz
+if(!$existingFile){
+    $file->setParents([$createdFolder->id]);
+}
+    $chunkSizeBytes = 1 * 1024 * 1024;
 
-                    $cikti_yolu_adi = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), '', $filePath);
-                    echo "<span style='color: blue;'>Başarılı:</span> ".$google_hedefadi.$cikti_yolu_adi."<br />";
+    // API'yi çağırıyoruz, ancak hemen yanıt almak yerine erteliyoruz.
+    $client->setDefer(true);
+        // Mevcut dosyayı güncelleme
+        if($existingFile){
+            $request = $service->files->update($existingFile->getId(), $file);
+        }else{
+        // Mevcut olmayan yeni dosyayı oluşturuyoruz
+            $request = $service->files->create($file);
+        }
+
+    // Dosya yüklememizi temsil eden bir medya dosya yüklemesi oluşturuyoruz.
+    $media = new Google\Http\MediaFileUpload(
+        $client,
+        $request,
+        mime_content_type($filePath),
+        null,
+        true,
+        $chunkSizeBytes
+    );
+    $media->setFileSize(filesize($filePath));
+
+    // Dosya okuma işlemi için kullanılan fonksiyon
+    if(!function_exists("readVideoChunk")){
+        function readVideoChunk($handle, $chunkSize)
+        {
+            $byteCount = 0;
+            $giantChunk = "";
+            while (!feof($handle)) {
+                // fread, okuma tamponlu ve düz bir dosyayı temsil etmiyorsa asla 8192 byte'dan fazla veri döndürmez
+                $chunk = fread($handle, 8192);
+                $byteCount += strlen($chunk);
+                $giantChunk .= $chunk;
+                if ($byteCount >= $chunkSize) {
+                    return $giantChunk;
                 }
             }
+            return $giantChunk;
         }
     }
-}
+
+    // Farklı parçaları yüklüyoruz. İşlem tamamlandıkça $status değeri false olacaktır.
+    $status = false;
+    $handle = fopen($filePath, "rb");
+    while (!$status && !feof($handle)) {
+        // $filePath'den $chunkSizeBytes kadar oku
+        $chunk = readVideoChunk($handle, $chunkSizeBytes);
+        $status = $media->nextChunk($chunk);
+    }
+
+    // $status'un nihai değeri, yüklenen nesnenin API'den gelen verileri olacaktır.
+    $result = $status;
+    fclose($handle);
+    
+    $cikti_yolu_adi = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), '', $filePath);
+
+    // Mevcut dosyalar için sonuç çıktısı
+    if($existingFile){
+        echo "<span style='color: red'>Dosyanın üzerine yazma başarılı-:</span> ".$google_hedefadi."/".$cikti_yolu_adi."<br />";
+    }else{
+    // Mevcut olmayan yeni dosyalar için sonuç çıktısı
+        echo "<span style='color: blue;'>Başarılı:</span> ".$google_hedefadi."/".$cikti_yolu_adi."<br />";
+    }
+#########################################################################################
+            } // } else { if (is_dir($filePath)) {
+        } // if ($dosya_adi != '.' && $dosya_adi != '..') {
+    } // foreach ($files as $dosya_adi) {
+} // function uploadFolder($client, $service, $parentId, $folderPath) {
+
 ##################################################################################################################################
 ##################################################################################################################################
 ##################################################################################################################################
@@ -123,7 +228,7 @@ $google_hedef_id    = $_POST['google_drive_dan_secilen_dosya_id'];
 $google_hedef_adi   = $_POST['google_drive_dan_secilen_dosya_adini_goster'];
 
 try {
-    searchFile($service, $google_hedef_id, $google_hedef_adi);
+    isFolder($google_hedef_id, $google_hedef_adi);
 } catch (Exception $e) {
     echo 'Yakalanan olağandışı durum mesajı: ';
     echo '<pre>' . print_r(json_decode($e->getMessage(), true), true) . '</pre>';
@@ -131,6 +236,7 @@ try {
     exit;
 }
 
+// Yerelden seçilen kaynak dosya ise uzantısı olması gerekir kontrol ediyoruz ve dosya ise
 if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
 
     $google_hedefadi = $google_hedef_adi == 'root' ? '' : $google_hedef_adi;
@@ -138,39 +244,41 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
     // Kaynak dosya olduğundan dosyayı hedefe yükle
     $dosya_adi = basename($yerelden_secilen);
     $filePath = $yerelden_secilen;
-    $existingFile = searchFile($service, $google_hedef_id, $dosya_adi);
+    $existingFile = isFile($google_hedef_id, $dosya_adi);
 
-    if($existingFile){
-        // Dosya zaten varsa, üzerine yaz
-/*
-        $existing_File = new Google_Service_Drive_DriveFile();
-        $service->files->update($existingFile->getId(), $existing_File, array(
-            'data' => file_get_contents($yerelden_secilen),
-            'mimeType' => mime_content_type($yerelden_secilen),
-            'uploadType' => 'media'
-        ));
-*/
-        // Google Drive API'ye gönderilecek dosya nesnesini oluşturuyoruz.
-        $file = new Google\Service\Drive\DriveFile();
-        $file->name = $dosya_adi;
-        $chunkSizeBytes = 1 * 1024 * 1024;
+######################################################################################################################################
+    // Google Drive API'ye gönderilecek dosya nesnesini oluşturuyoruz.
+    $file = new Google\Service\Drive\DriveFile();
+    $file->name = $dosya_adi;
+// Dosya mevcut değil ise yenin dosyanın yükleneceği klasörün ID sini belirtiyoruz
+if(!$existingFile){
+    $file->setParents([$google_hedef_id]);
+}
+    $chunkSizeBytes = 1 * 1024 * 1024;
 
-        // API'yi çağırıyoruz, ancak hemen yanıt almak yerine erteliyoruz.
-        $client->setDefer(true);
-        //$request = $service->files->create($file);
+    // API'yi çağırıyoruz, ancak hemen yanıt almak yerine erteliyoruz.
+    $client->setDefer(true);
+        // Mevcut dosyayı güncelleme
+        if($existingFile){
+            $request = $service->files->update($existingFile->getId(), $file);
+        }else{
+        // Mevcut olmayan yeni dosyayı oluşturuyoruz
+            $request = $service->files->create($file);
+        }
 
-        // Dosya yüklememizi temsil eden bir medya dosya yüklemesi oluşturuyoruz.
-        $media = new Google\Http\MediaFileUpload(
-            $client,
-            $service->files->update($existingFile->getId(), $file),
-            'text/plain',
-            null,
-            true,
-            $chunkSizeBytes
-        );
-        $media->setFileSize(filesize($yerelden_secilen));
+    // Dosya yüklememizi temsil eden bir medya dosya yüklemesi oluşturuyoruz.
+    $media = new Google\Http\MediaFileUpload(
+        $client,
+        $request,
+        mime_content_type($yerelden_secilen),
+        null,
+        true,
+        $chunkSizeBytes
+    );
+    $media->setFileSize(filesize($filePath));
 
-        // Dosya okuma işlemi için kullanılan fonksiyon
+    // Dosya okuma işlemi için kullanılan fonksiyon
+    if(!function_exists("readVideoChunk")){
         function readVideoChunk($handle, $chunkSize)
         {
             $byteCount = 0;
@@ -186,89 +294,34 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
             }
             return $giantChunk;
         }
+    }
 
-        // Farklı parçaları yüklüyoruz. İşlem tamamlandıkça $status değeri false olacaktır.
-        $status = false;
-        $handle = fopen($yerelden_secilen, "rb");
-        while (!$status && !feof($handle)) {
-            // $yerelden_secilen'den $chunkSizeBytes kadar oku
-            $chunk = readVideoChunk($handle, $chunkSizeBytes);
-            $status = $media->nextChunk($chunk);
-        }
+    // Farklı parçaları yüklüyoruz. İşlem tamamlandıkça $status değeri false olacaktır.
+    $status = false;
+    $handle = fopen($filePath, "rb");
+    while (!$status && !feof($handle)) {
+        // $filePath'den $chunkSizeBytes kadar oku
+        $chunk = readVideoChunk($handle, $chunkSizeBytes);
+        $status = $media->nextChunk($chunk);
+    }
 
-        // $status'un nihai değeri, yüklenen nesnenin API'den gelen verileri olacaktır.
-        $result = $status;
-        fclose($handle);
+    // $status'un nihai değeri, yüklenen nesnenin API'den gelen verileri olacaktır.
+    $result = $status;
+    fclose($handle);
 
+    // Mevcut dosyalar için sonuç çıktısı
+    if($existingFile){
         echo "<span style='color: red'>Dosyanın üzerine yazma başarılı:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }else{
-/*
-$fileMetadata = new Google_Service_Drive_DriveFile();
-$fileMetadata->setName($file);
-$fileMetadata->setParents([$google_hedef_id]);
-$createdFile = $service->files->create($fileMetadata, [
-	'data' => file_get_contents($filePath),
-	'mimeType' => mime_content_type($filePath),
-	'uploadType' => 'media',
-]);
-*/
-        // Dosya yoksa, yeni dosya oluştur
-        // Google Drive API'ye gönderilecek dosya nesnesini oluşturuyoruz.
-        $file = new Google\Service\Drive\DriveFile();
-        $file->name = $dosya_adi;
-        $file->setParents([$google_hedef_id]);
-        $chunkSizeBytes = 1 * 1024 * 1024;
-
-        // API'yi çağırıyoruz, ancak hemen yanıt almak yerine erteliyoruz.
-        $client->setDefer(true);
-        $request = $service->files->create($file);
-
-        // Dosya yüklememizi temsil eden bir medya dosya yüklemesi oluşturuyoruz.
-        $media = new Google\Http\MediaFileUpload(
-            $client,
-            $request,
-            'text/plain',
-            null,
-            true,
-            $chunkSizeBytes
-        );
-        $media->setFileSize(filesize($yerelden_secilen));
-
-        // Dosya okuma işlemi için kullanılan fonksiyon
-        function readVideoChunk($handle, $chunkSize)
-        {
-            $byteCount = 0;
-            $giantChunk = "";
-            while (!feof($handle)) {
-                // fread, okuma tamponlu ve düz bir dosyayı temsil etmiyorsa asla 8192 byte'dan fazla veri döndürmez
-                $chunk = fread($handle, 8192);
-                $byteCount += strlen($chunk);
-                $giantChunk .= $chunk;
-                if ($byteCount >= $chunkSize) {
-                    return $giantChunk;
-                }
-            }
-            return $giantChunk;
-        }
-
-        // Farklı parçaları yüklüyoruz. İşlem tamamlandıkça $status değeri false olacaktır.
-        $status = false;
-        $handle = fopen($yerelden_secilen, "rb");
-        while (!$status && !feof($handle)) {
-            // $yerelden_secilen'den $chunkSizeBytes kadar oku
-            $chunk = readVideoChunk($handle, $chunkSizeBytes);
-            $status = $media->nextChunk($chunk);
-        }
-
-        // $status'un nihai değeri, yüklenen nesnenin API'den gelen verileri olacaktır.
-        $result = $status;
-        fclose($handle);
-
+    // Mevcut olmayan yeni dosyalar için sonuç çıktısı
         echo "<span style='color: blue;'>Başarılı:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }
+######################################################################################################################################
+
+// Yerelden seçilen kaynak klasör
 }else{
-    // Kaynak klasör olduğundan fonksiyonu çağırarak dosyaları yükle
-    uploadFolder($service, $google_hedef_id, $yerelden_secilen);
+    // Kaynak klasör olduğundan fonksiyonu çağırarak dosyaları yüklüyoruz
+    $dizin_liste_array = uploadFolder($google_hedef_id, $yerelden_secilen);
 }
 ##################################################################################################################################
 ##################################################################################################################################
