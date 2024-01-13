@@ -55,7 +55,7 @@ ini_set('display_errors', 1);
     $genel_ayarlar = $gene_ayarlar->fetch(PDO::FETCH_ASSOC);
 ########################################################################################################################
     // Google Drive Servis Hesabının hesap bilgileri içeren json dosyanın yolu
-    $authConfigPath = 'plugins/google_drive/client_secrets.json';
+    $authConfigPath = 'plugins/google_drive/client_json/client_secrets.json';
 ########################################################################################################################
 
 
