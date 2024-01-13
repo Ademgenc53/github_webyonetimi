@@ -3,7 +3,7 @@
 session_start();
 require_once('includes/connect.php');
 
-require "doviz/vendor/autoload.php";
+require "plugins/doviz/vendor/autoload.php";
 
 use Teknomavi\Tcmb\Doviz;
 
