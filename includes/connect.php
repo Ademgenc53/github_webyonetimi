@@ -54,6 +54,10 @@ ini_set('display_errors', 1);
     $gene_ayarlar->execute(['1']);
     $genel_ayarlar = $gene_ayarlar->fetch(PDO::FETCH_ASSOC);
 ########################################################################################################################
+    // Google Drive Servis Hesabının hesap bilgileri içeren json dosyanın yolu
+    $authConfigPath = 'plugins/google_drive/client_secrets.json';
+########################################################################################################################
+
 
     // veritabanı yedeklenecek 'DATABASEBACKUP' klasör adını değiştirebilirsiniz
     // Bu web sitenin dışında yedekleme klasörü oluşturabilirsiniz
