@@ -505,15 +505,15 @@ function uploadFolder($service, $parentId, $folderPath) {
 
             if (is_dir($filePath)) {
                 // Eğer dosya bir klasör ise, alt klasörü yükle
-                uploadFolder($service, $createdFolder->id, $filePath);
+                uploadFolder($existingFolderId, $filePath);
             } else {
                 // Eğer dosya bir dosya ise, dosyayı yükle
-                $existingFile = searchFile($service, $createdFolder->id, $file);
+                $existingFileId = getFilesIdIfExists($existingFolderId, $file);
 
-                if ($existingFile) {
+                if ($existingFileId) {
                     // Dosya zaten varsa, üzerine yaz
                     $existing_File = new Google_Service_Drive_DriveFile();
-                    $service->files->update($existingFile->getId(), $existing_File, array(
+                    $service->files->update($existingFileId, $existing_File, array(
                         'data' => file_get_contents($filePath),
                         'mimeType' => mime_content_type($filePath),
                         'uploadType' => 'media'
@@ -524,7 +524,7 @@ function uploadFolder($service, $parentId, $folderPath) {
                     // Dosya yoksa, yeni dosya oluştur
                     $fileMetadata = new Google_Service_Drive_DriveFile();
                     $fileMetadata->setName($file);
-                    $fileMetadata->setParents([$createdFolder->id]);
+                    $fileMetadata->setParents([$existingFolderId]);
                     $createdFile = $service->files->create($fileMetadata, [
                         'data' => file_get_contents($filePath),
                         'mimeType' => mime_content_type($filePath),
@@ -593,7 +593,7 @@ function createDirectory($service, $parentId, $path) {
     $google_hedef_adi   = $rootId;
 /*
 try {
-    searchFile($service, $google_hedef_id, $google_hedef_adi);
+    $existingFileId = getFilesIdIfExists($google_hedef_id, $google_hedef_adi);
 } catch (Exception $e) {
     echo 'Yakalanan olağandışı durum mesajı: ';
     echo '<pre>' . print_r(json_decode($e->getMessage(), true), true) . '</pre>';
@@ -607,13 +607,13 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
 
     // Kaynak dosya olduğundan dosyayı hedefe yükle
     $dosya_adi = basename($yerelden_secilen);
-    $existingFile = searchFile($service, $google_hedef_id, $dosya_adi);
+    $existingFileId = getFilesIdIfExists($google_hedef_id, $dosya_adi);
 
-    if($existingFile){
+    if($existingFileId){
         // Dosya zaten varsa, üzerine yaz
 /*
         $existing_File = new Google_Service_Drive_DriveFile();
-        $service->files->update($existingFile->getId(), $existing_File, array(
+        $service->files->update($existingFileId, $existing_File, array(
             'data' => file_get_contents($yerelden_secilen),
             'mimeType' => mime_content_type($yerelden_secilen),
             'uploadType' => 'media'
@@ -631,7 +631,7 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
         // Dosya yüklememizi temsil eden bir medya dosya yüklemesi oluşturuyoruz.
         $media = new Google\Http\MediaFileUpload(
             $client,
-            $service->files->update($existingFile->getId(), $file),
+            $service->files->update($existingFileId, $file),
             'text/plain',
             null,
             true,
