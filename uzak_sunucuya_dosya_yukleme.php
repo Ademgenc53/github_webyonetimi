@@ -35,65 +35,49 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 // Her yerel alandan googla yükleme kodu
 if(isset($_POST['googla_yukle']) && $_POST['googla_yukle'] == '1' && isset($_POST['yerel_den_secilen_dosya']) && !empty($_POST['yerel_den_secilen_dosya']) && isset($_POST['google_drive_dan_secilen_dosya_id']) && !empty($_POST['google_drive_dan_secilen_dosya_id']))
 {
-
 ##################################################################################################################################
 ##################################################################################################################################
 ##################################################################################################################################
 // Dosya mevcut mu kontrol ediyoruz. Mevcut ise ID sini alıyoruz
-function isFile($parentId, $fileName) {
+function getFilesIdIfExists($parentId, $fileName) {
 
-GLOBAL $authConfigPath;
-$client = new Google\Client();
-$client->setAuthConfig($authConfigPath);
-$client->addScope(Google\Service\Drive::DRIVE);
-$service = new Google\Service\Drive($client);
+    GLOBAL $authConfigPath;
+    $client = new Google\Client();
+    $client->setAuthConfig($authConfigPath);
+    $client->addScope(Google\Service\Drive::DRIVE);
+    $service = new Google\Service\Drive($client);
 
-    $results = $service->files->listFiles([
-        'q' => "name='" . $fileName . "' and '" . $parentId . "' in parents",
-    ]);
-/*
-$dosya = fopen ("metin2.txt" , "a"); //dosya oluşturma işlemi 
-$yaz = "isFile\n".print_r($results, true); // Yazmak istediginiz yazı 
-fwrite($dosya,$yaz); fclose($dosya);
-*/
+    $query = "name='$fileName' and '$parentId' in parents";
+    $results = $service->files->listFiles(['q' => $query, 'fields' => 'files(id)']);
+
     // Dosya bulunamadıysa false döndür
-    if (count($results->getFiles())==0) {
+    if (count($results->files) == 0) {
         return false;
     }
 
-    $file = $results->getFiles()[0];
     // Dosya türüne göre kontrol et. Klasör değil ise sonucu döndür
-    if($file->getMimeType() !== 'application/vnd.google-apps.folder'){
-        return $results->getFiles()[0];
+    if (count($results->files) > 0) {
+        if($results->files[0]->mimetype !== 'application/vnd.google-apps.folder'){
+            return $results->files[0]->id;
+        }
     }
 }
 ##################################################################################################################################
-// Klasör mevcut mu kontrol ediyoruz. Mevcut ise ID sini alıyoruz
-function isFolder($parentId, $fileName) {
+// Bu fonksiyon, belirtilen isimde bir dizin varsa ID'sini döndürür.
+function getFolderIdIfExists($parentId, $folderName) {
 
-GLOBAL $authConfigPath;
-$client = new Google\Client();
-$client->setAuthConfig($authConfigPath);
-$client->addScope(Google\Service\Drive::DRIVE);
-$service = new Google\Service\Drive($client);
+    GLOBAL $authConfigPath;
+    $client = new Google\Client();
+    $client->setAuthConfig($authConfigPath);
+    $client->addScope(Google\Service\Drive::DRIVE);
+    $service = new Google\Service\Drive($client);
 
-    $results = $service->files->listFiles([
-        'q' => "name='" . $fileName . "' and '" . $parentId . "' in parents",
-    ]);
-/*
-$dosya = fopen ("metin.txt" , "a"); //dosya oluşturma işlemi 
-$yaz = "isFolder\n".print_r($results, true); // Yazmak istediginiz yazı 
-fwrite($dosya,$yaz); fclose($dosya);
-*/
-    // Dosya bulunamadıysa false döndür
-    if (count($results->getFiles())==0) {
-        return false;
+    $query = "mimeType='application/vnd.google-apps.folder' and name='$folderName' and '$parentId' in parents";
+    $results = $service->files->listFiles(['q' => $query, 'fields' => 'files(id)']);
+    if (count($results->files) > 0) {
+        return $results->files[0]->id;
     }
-    $file = $results->getFiles()[0];
-    // Dosya türüne göre kontrol et, Klasör ise sonucu döndür
-    if($file->getMimeType() === 'application/vnd.google-apps.folder'){
-        return $results->getFiles()[0];
-    }
+    return null;
 }
 ##################################################################################################################################
 ##################################################################################################################################
@@ -110,11 +94,11 @@ $service = new Google\Service\Drive($client);
     $folderName = basename($folderPath);
 
     // Klasörün mevcut olup olmadığını kontrol ediyoruz
-    $existingFolder = isFolder($parentId, $folderName);
+    $existingFolderId = getFolderIdIfExists($parentId, $folderName);
 
     // Klasör mevcut ise klasör ID sini alıyoruz
-    if ($existingFolder) {
-        $createdFolder = $existingFolder;
+    if ($existingFolderId) {
+        $createdFolder = $existingFolderId;
     } else {
         // Klasör mevcut değil ise yeni klasör oluşturuyoruz
         $folder = new Google\Service\Drive\DriveFile();
@@ -122,10 +106,10 @@ $service = new Google\Service\Drive($client);
         $folder->setMimeType('application/vnd.google-apps.folder');
         $folder->setParents([$parentId]);
 
-        $createdFolder = $service->files->create($folder);
+        $createdFolderid = $service->files->create($folder);
+        $createdFolder = $createdFolderid->id;
     }
 
-    $dosyalar_array = [];
     // Lokal Klasörün içindeki dosyaları google drive'a okuyarak yüklüyoruz
     $files = scandir($folderPath);
     foreach ($files as $dosya_adi) {
@@ -134,29 +118,29 @@ $service = new Google\Service\Drive($client);
 
             if (is_dir($filePath)) {
                 // Eğer dosya bir klasör ise, alt klasörü yükle
-                uploadFolder($createdFolder->id, $filePath);
+                uploadFolder($createdFolder, $filePath);
             } else {
                 // Eğer dosya bir dosya ise, dosyayı yükle
 
                 // Dosya mecut mu kontrol ediyorum
-                $existingFile = isFile($createdFolder->id, $dosya_adi);
+                $existingFileId = getFilesIdIfExists($createdFolder, $dosya_adi);
 
 // Sonuca göre sıradaki dosyayı yüklemeye başlıyoruz
 #########################################################################################
     // Google Drive API'ye gönderilecek dosya nesnesini oluşturuyoruz.
     $file = new Google\Service\Drive\DriveFile();
     $file->name = $dosya_adi;
-// Dosya mevcut değil ise yenin dosyanın yükleneceği klasörün ID sini belirtiyoruz
-if(!$existingFile){
-    $file->setParents([$createdFolder->id]);
-}
+    // Dosya mevcut değil ise yenin dosyanın yükleneceği klasörün ID sini belirtiyoruz
+    if(!$existingFileId){
+        $file->setParents([$createdFolder]);
+    }
     $chunkSizeBytes = 1 * 1024 * 1024;
 
     // API'yi çağırıyoruz, ancak hemen yanıt almak yerine erteliyoruz.
     $client->setDefer(true);
         // Mevcut dosyayı güncelleme
-        if($existingFile){
-            $request = $service->files->update($existingFile->getId(), $file);
+        if($existingFileId){
+            $request = $service->files->update($existingFileId, $file);
         }else{
         // Mevcut olmayan yeni dosyayı oluşturuyoruz
             $request = $service->files->create($file);
@@ -208,7 +192,7 @@ if(!$existingFile){
     $cikti_yolu_adi = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), '', $filePath);
 
     // Mevcut dosyalar için sonuç çıktısı
-    if($existingFile){
+    if($existingFileId){
         echo "<span style='color: red'>Dosyanın üzerine yazma başarılı-:</span> ".$google_hedefadi."/".$cikti_yolu_adi."<br />";
     }else{
     // Mevcut olmayan yeni dosyalar için sonuç çıktısı
@@ -228,7 +212,7 @@ $google_hedef_id    = $_POST['google_drive_dan_secilen_dosya_id'];
 $google_hedef_adi   = $_POST['google_drive_dan_secilen_dosya_adini_goster'];
 
 try {
-    isFolder($google_hedef_id, $google_hedef_adi);
+    getFolderIdIfExists($google_hedef_id, $google_hedef_adi);
 } catch (Exception $e) {
     echo 'Yakalanan olağandışı durum mesajı: ';
     echo '<pre>' . print_r(json_decode($e->getMessage(), true), true) . '</pre>';
@@ -244,14 +228,14 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
     // Kaynak dosya olduğundan dosyayı hedefe yükle
     $dosya_adi = basename($yerelden_secilen);
     $filePath = $yerelden_secilen;
-    $existingFile = isFile($google_hedef_id, $dosya_adi);
+    $existingFileId = getFilesIdIfExists($google_hedef_id, $dosya_adi);
 
 ######################################################################################################################################
     // Google Drive API'ye gönderilecek dosya nesnesini oluşturuyoruz.
     $file = new Google\Service\Drive\DriveFile();
     $file->name = $dosya_adi;
 // Dosya mevcut değil ise yenin dosyanın yükleneceği klasörün ID sini belirtiyoruz
-if(!$existingFile){
+if(!$existingFileId){
     $file->setParents([$google_hedef_id]);
 }
     $chunkSizeBytes = 1 * 1024 * 1024;
@@ -259,8 +243,8 @@ if(!$existingFile){
     // API'yi çağırıyoruz, ancak hemen yanıt almak yerine erteliyoruz.
     $client->setDefer(true);
         // Mevcut dosyayı güncelleme
-        if($existingFile){
-            $request = $service->files->update($existingFile->getId(), $file);
+        if($existingFileId){
+            $request = $service->files->update($existingFileId, $file);
         }else{
         // Mevcut olmayan yeni dosyayı oluşturuyoruz
             $request = $service->files->create($file);
@@ -310,14 +294,13 @@ if(!$existingFile){
     fclose($handle);
 
     // Mevcut dosyalar için sonuç çıktısı
-    if($existingFile){
+    if($existingFileId){
         echo "<span style='color: red'>Dosyanın üzerine yazma başarılı:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }else{
     // Mevcut olmayan yeni dosyalar için sonuç çıktısı
         echo "<span style='color: blue;'>Başarılı:</span> ".$google_hedefadi."/".$dosya_adi."<br />";
     }
 ######################################################################################################################################
-
 // Yerelden seçilen kaynak klasör
 }else{
     // Kaynak klasör olduğundan fonksiyonu çağırarak dosyaları yüklüyoruz

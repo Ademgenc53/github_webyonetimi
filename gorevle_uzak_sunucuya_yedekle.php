@@ -2,7 +2,7 @@
 // Bismillahirrahmanirrahim
 session_start();
 require_once('includes/connect.php');
-require_once('check-login.php');
+//require_once('check-login.php');
 require_once("includes/turkcegunler.php");
 
 ob_start();
@@ -308,23 +308,176 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['google_yedekle']) && $_
 
 ##################################################################################################################################
 ##################################################################################################################################
-// Belirli bir klasörde dosya arama
-function searchFile($service, $parentId, $fileName) {
-    $results = $service->files->listFiles([
-        'q' => "name='".$fileName."' and '".$parentId."' in parents",
-    ]);
+// Dosya mevcut mu kontrol ediyoruz. Mevcut ise ID sini alıyoruz
+function getFilesIdIfExists($parentId, $fileName) {
 
-    if (count($results->getFiles()) > 0) {
-        return $results->getFiles()[0];
-    } else {
-        return null;
+    GLOBAL $authConfigPath;
+    $client = new Google\Client();
+    $client->setAuthConfig($authConfigPath);
+    $client->addScope(Google\Service\Drive::DRIVE);
+    $service = new Google\Service\Drive($client);
+
+    $query = "name='$fileName' and '$parentId' in parents";
+    $results = $service->files->listFiles(['q' => $query, 'fields' => 'files(id)']);
+
+    // Dosya bulunamadıysa false döndür
+    if (count($results->files) == 0) {
+        return false;
+    }
+
+    // Dosya türüne göre kontrol et. Klasör değil ise sonucu döndür
+    if (count($results->files) > 0) {
+        if($results->files[0]->mimetype !== 'application/vnd.google-apps.folder'){
+            return $results->files[0]->id;
+        }
     }
 }
 ##################################################################################################################################
+// Bu fonksiyon, belirtilen isimde bir dizin varsa ID'sini döndürür.
+function getFolderIdIfExists($parentId, $folderName) {
+
+    GLOBAL $authConfigPath;
+    $client = new Google\Client();
+    $client->setAuthConfig($authConfigPath);
+    $client->addScope(Google\Service\Drive::DRIVE);
+    $service = new Google\Service\Drive($client);
+
+    $query = "mimeType='application/vnd.google-apps.folder' and name='$folderName' and '$parentId' in parents";
+    $results = $service->files->listFiles(['q' => $query, 'fields' => 'files(id)']);
+    if (count($results->files) > 0) {
+        return $results->files[0]->id;
+    }
+    return null;
+}
 ##################################################################################################################################
 ##################################################################################################################################
+// Klasör ve tüm alt-klasörler ve dosyaları google drive a yükle
+function uploadFolder($parentId, $folderPath) {
+
+    GLOBAL $authConfigPath, $google_hedef_adi;
+    $client = new Google\Client();
+    $client->setAuthConfig($authConfigPath);
+    $client->addScope(Google\Service\Drive::DRIVE);
+    $service = new Google\Service\Drive($client);
+
+    $google_hedefadi = $google_hedef_adi == 'root' ? '' : $google_hedef_adi;
+    $folderName = basename($folderPath);
+
+    // Klasörün mevcut olup olmadığını kontrol ediyoruz
+    $existingFolderId = getFolderIdIfExists($parentId, $folderName);
+
+    // Klasör mevcut ise klasör ID sini alıyoruz
+    if ($existingFolderId) {
+        $createdFolder = $existingFolderId;
+    } else {
+        // Klasör mevcut değil ise yeni klasör oluşturuyoruz
+        $folder = new Google\Service\Drive\DriveFile();
+        $folder->setName($folderName);
+        $folder->setMimeType('application/vnd.google-apps.folder');
+        $folder->setParents([$parentId]);
+
+        $createdFolderid = $service->files->create($folder);
+        $createdFolder = $createdFolderid->id;
+    }
+
+    // Lokal Klasörün içindeki dosyaları google drive'a okuyarak yüklüyoruz
+    $files = scandir($folderPath);
+    foreach ($files as $dosya_adi) {
+        if ($dosya_adi != '.' && $dosya_adi != '..') {
+            $filePath = $folderPath . '/' . $dosya_adi;
+
+            if (is_dir($filePath)) {
+                // Eğer dosya bir klasör ise, alt klasörü yükle
+                uploadFolder($createdFolder, $filePath);
+            } else {
+                // Eğer dosya bir dosya ise, dosyayı yükle
+
+                // Dosya mecut mu kontrol ediyorum
+                $existingFileId = getFilesIdIfExists($createdFolder, $dosya_adi);
+
+// Sonuca göre sıradaki dosyayı yüklemeye başlıyoruz
+#########################################################################################
+    // Google Drive API'ye gönderilecek dosya nesnesini oluşturuyoruz.
+    $file = new Google\Service\Drive\DriveFile();
+    $file->name = $dosya_adi;
+    // Dosya mevcut değil ise yenin dosyanın yükleneceği klasörün ID sini belirtiyoruz
+    if(!$existingFileId){
+        $file->setParents([$createdFolder]);
+    }
+    $chunkSizeBytes = 1 * 1024 * 1024;
+
+    // API'yi çağırıyoruz, ancak hemen yanıt almak yerine erteliyoruz.
+    $client->setDefer(true);
+        // Mevcut dosyayı güncelleme
+        if($existingFileId){
+            $request = $service->files->update($existingFileId, $file);
+        }else{
+        // Mevcut olmayan yeni dosyayı oluşturuyoruz
+            $request = $service->files->create($file);
+        }
+
+    // Dosya yüklememizi temsil eden bir medya dosya yüklemesi oluşturuyoruz.
+    $media = new Google\Http\MediaFileUpload(
+        $client,
+        $request,
+        mime_content_type($filePath),
+        null,
+        true,
+        $chunkSizeBytes
+    );
+    $media->setFileSize(filesize($filePath));
+
+    // Dosya okuma işlemi için kullanılan fonksiyon
+    if(!function_exists("readVideoChunk")){
+        function readVideoChunk($handle, $chunkSize)
+        {
+            $byteCount = 0;
+            $giantChunk = "";
+            while (!feof($handle)) {
+                // fread, okuma tamponlu ve düz bir dosyayı temsil etmiyorsa asla 8192 byte'dan fazla veri döndürmez
+                $chunk = fread($handle, 8192);
+                $byteCount += strlen($chunk);
+                $giantChunk .= $chunk;
+                if ($byteCount >= $chunkSize) {
+                    return $giantChunk;
+                }
+            }
+            return $giantChunk;
+        }
+    }
+
+    // Farklı parçaları yüklüyoruz. İşlem tamamlandıkça $status değeri false olacaktır.
+    $status = false;
+    $handle = fopen($filePath, "rb");
+    while (!$status && !feof($handle)) {
+        // $filePath'den $chunkSizeBytes kadar oku
+        $chunk = readVideoChunk($handle, $chunkSizeBytes);
+        $status = $media->nextChunk($chunk);
+    }
+
+    // $status'un nihai değeri, yüklenen nesnenin API'den gelen verileri olacaktır.
+    $result = $status;
+    fclose($handle);
+    
+    $cikti_yolu_adi = str_replace(array(BACKUPDIR, ZIPDIR, DIZINDIR), '', $filePath);
+
+    // Mevcut dosyalar için sonuç çıktısı
+    if($existingFileId){
+        //echo "<span style='color: red'>Dosyanın üzerine yazma başarılı-:</span> ".$google_hedefadi."/".$cikti_yolu_adi."<br />";
+    }else{
+    // Mevcut olmayan yeni dosyalar için sonuç çıktısı
+        //echo "<span style='color: blue;'>Başarılı:</span> ".$google_hedefadi."/".$cikti_yolu_adi."<br />";
+    }
+#########################################################################################
+            } // } else { if (is_dir($filePath)) {
+        } // if ($dosya_adi != '.' && $dosya_adi != '..') {
+    } // foreach ($files as $dosya_adi) {
+} // function uploadFolder($client, $service, $parentId, $folderPath) {
+##################################################################################################################################
+/*
 // Klasör ve alt içerikleri yükleme fonksiyonu
 function uploadFolder($service, $parentId, $folderPath) {
+
     GLOBAL $google_hedef_adi;
     $google_hedefadi = $google_hedef_adi == 'root' ? '' : $google_hedef_adi;
     $folderName = basename($folderPath);
@@ -384,11 +537,12 @@ function uploadFolder($service, $parentId, $folderPath) {
         }
     }
 }
+*/
 ##################################################################################################################################
 ##################################################################################################################################
 ##################################################################################################################################
 // ÖN DİZİNLER VARSA ÖNCE ÖN DİZİNLERİ OLUŞTURUP SON DİZİN ID SİNİ ALIP O DİZİNE YEDEK YÜKLENMEYE BAŞLANACAK
-
+/*
 // Bu fonksiyon, belirtilen isimde bir dizin varsa ID'sini döndürür.
 function getFolderIdIfExists($service, $parentId, $folderName) {
     $query = "mimeType='application/vnd.google-apps.folder' and name='$folderName' and '$parentId' in parents";
@@ -398,10 +552,10 @@ function getFolderIdIfExists($service, $parentId, $folderName) {
     }
     return null;
 }
-
+*/
 // Bu fonksiyon, belirtilen isimde bir dizin oluşturur veya varsa ID'sini döndürür.
 function createOrGetFolder($service, $parentId, $folderName) {
-    $existingFolderId = getFolderIdIfExists($service, $parentId, $folderName);
+    $existingFolderId = getFolderIdIfExists($parentId, $folderName);
 
     if ($existingFolderId) {
         return $existingFolderId;
@@ -585,7 +739,7 @@ if(pathinfo($yerelden_secilen, PATHINFO_EXTENSION)){
     echo "<span>Google Drive Sunucusuna Başarıyla Yedeklendi</span>";
 }else{
     // Kaynak klasör olduğundan fonksiyonu çağırarak dosyaları yükle
-    uploadFolder($service, $google_hedef_id, $yerelden_secilen);
+    uploadFolder($google_hedef_id, $yerelden_secilen);
     echo "<span>Google Drive Sunucusuna Başarıyla Yedeklendi</span>";
 }
 ##################################################################################################################################
