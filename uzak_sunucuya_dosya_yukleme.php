@@ -14,14 +14,14 @@ if (!(PHP_VERSION_ID >= 80100)) {
     exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Kütüphanesi En Düşük \">= 8.1.0\" PHP sürümünü gerektirir. Siz " . PHP_VERSION . " Çalıştırıyorsunuz.</div>");
 }
 
-if (!file_exists($authConfigPath)) {
+if (!file_exists(AUTHCONFIGPATH)) {
     die('Hata: AuthConfig dosyası bulunamadı.');
 }
 
 require_once __DIR__.'/plugins/google_drive/vendor/autoload.php';
 
 $client = new Google\Client();
-$client->setAuthConfig($authConfigPath);
+$client->setAuthConfig(AUTHCONFIGPATH);
 $client->addScope(Google\Service\Drive::DRIVE);
 $service = new Google\Service\Drive($client);
 
@@ -41,9 +41,8 @@ if(isset($_POST['googla_yukle']) && $_POST['googla_yukle'] == '1' && isset($_POS
 // Dosya mevcut mu kontrol ediyoruz. Mevcut ise ID sini alıyoruz
 function getFilesIdIfExists($parentId, $fileName) {
 
-    GLOBAL $authConfigPath;
     $client = new Google\Client();
-    $client->setAuthConfig($authConfigPath);
+    $client->setAuthConfig(AUTHCONFIGPATH);
     $client->addScope(Google\Service\Drive::DRIVE);
     $service = new Google\Service\Drive($client);
 
@@ -66,9 +65,8 @@ function getFilesIdIfExists($parentId, $fileName) {
 // Bu fonksiyon, belirtilen isimde bir dizin varsa ID'sini döndürür.
 function getFolderIdIfExists($parentId, $folderName) {
 
-    GLOBAL $authConfigPath;
     $client = new Google\Client();
-    $client->setAuthConfig($authConfigPath);
+    $client->setAuthConfig(AUTHCONFIGPATH);
     $client->addScope(Google\Service\Drive::DRIVE);
     $service = new Google\Service\Drive($client);
 
@@ -84,13 +82,12 @@ function getFolderIdIfExists($parentId, $folderName) {
 // Klasör ve tüm alt-klasörler ve dosyaları google drive a yükle
 function uploadFolder($parentId, $folderPath) {
 
-GLOBAL $authConfigPath, $google_hedef_adi;
 $client = new Google\Client();
-$client->setAuthConfig($authConfigPath);
+$client->setAuthConfig(AUTHCONFIGPATH);
 $client->addScope(Google\Service\Drive::DRIVE);
 $service = new Google\Service\Drive($client);
 
-    $google_hedefadi = $google_hedef_adi == 'root' ? '' : $google_hedef_adi;
+    $google_hedefadi = GOOGLE_HEDEF_ADI == 'root' ? '' : GOOGLE_HEDEF_ADI;
     $folderName = basename($folderPath);
 
     // Klasörün mevcut olup olmadığını kontrol ediyoruz
@@ -210,6 +207,7 @@ $service = new Google\Service\Drive($client);
 $yerelden_secilen   = rtrim($_POST['yerel_den_secilen_dosya'], '/');
 $google_hedef_id    = $_POST['google_drive_dan_secilen_dosya_id'];
 $google_hedef_adi   = $_POST['google_drive_dan_secilen_dosya_adini_goster'];
+defined('GOOGLE_HEDEF_ADI')        or define('GOOGLE_HEDEF_ADI', $google_hedef_adi);
 
 try {
     getFolderIdIfExists($google_hedef_id, $google_hedef_adi);

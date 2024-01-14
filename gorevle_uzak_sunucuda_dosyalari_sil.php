@@ -2,7 +2,7 @@
 // Bismillahirrahmanirrahim
 session_start();
 require_once('includes/connect.php');
-require_once('check-login.php');
+//require_once('check-login.php');
 require_once("includes/turkcegunler.php");
 
 ob_start();
@@ -14,14 +14,14 @@ if (!(PHP_VERSION_ID >= 80100)) {
     exit("<div style='font-weight: bold;font-size: 16px;text-align:center;font-family: Arial, Helvetica, sans-serif;'>Google Drive Kütüphanesi En Düşük \">= 8.1.0\" PHP sürümünü gerektirir. Siz " . PHP_VERSION . " Çalıştırıyorsunuz.</div>");
 }
 
-if (!file_exists($authConfigPath)) {
+if (!file_exists(AUTHCONFIGPATH)) {
     die('Hata: AuthConfig dosyası bulunamadı.');
 }
 
 require_once __DIR__.'/plugins/google_drive/vendor/autoload.php';
 
 $client = new Google\Client();
-$client->setAuthConfig($authConfigPath);
+$client->setAuthConfig(AUTHCONFIGPATH);
 $client->addScope(Google\Service\Drive::DRIVE);
 $service = new Google\Service\Drive($client);
 
