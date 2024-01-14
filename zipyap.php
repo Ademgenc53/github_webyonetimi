@@ -61,52 +61,11 @@ if (file_exists($source) && count(glob($source . '*')) !== 0) {
 }
     return "none"; //"Klasör yolu geçersiz: <b>".$source."</b>";
 }
-/*
-function zipData($source, $destination) {
+##################################################################################################################################################################
+##################################################################################################################################################################
 
-if (file_exists($source) && count(glob($source . '*')) !== 0) {
-
-        $zip = new ZipArchive();
-        if ( $zip->open($destination, ZIPARCHIVE::CREATE) ) {
-            $source = realpath($source);
-            $sourceLength = strlen($source); //
-            global $zipyorumadizinadi;
-            $zip->setArchiveComment($zipyorumadizinadi);
-            if (is_dir($source)) {
-                $iterator = new RecursiveDirectoryIterator($source);
-                // yineleme sırasında nokta dosyalarını atla
-                $iterator->setFlags(RecursiveDirectoryIterator::SKIP_DOTS);
-                $files = new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::SELF_FIRST);
-
-                foreach ($files as $file) {
-                    $file = realpath($file);
-                    $relativePath = substr($file, $sourceLength); //
-                    //echo $file."<br>";
-
-                    if (is_dir($file) === true) {
-                        //$zip->addEmptyDir(str_replace($source . '', '', $file . ''));
-                        $zip->addEmptyDir(ltrim($relativePath, '/\\'));
-                    } else if (is_file($file) === true) {
-                        //$zip->addFromString(str_replace($source . '', '', $file), file_get_contents($file));
-                        $zip->addFromString(ltrim($relativePath, '/\\'), file_get_contents($file));
-                    }
-                }
-            } else if (is_file($source)) {
-                $zip->addFromString(basename($source), file_get_contents($source));
-            }
-        }
-        
-        if($zip->close()){
-            return "Zip Arşivi Başarıyla Oluşturuldu";
-        }else{
-            return "Zip Arşivi Bir Hatadan Dolayı Oluşturulamadı";
-        }
-    }
-
-return "Klasör yolu geçersiz: <b>".$source."</b>";
-
-}
-*/
+##################################################################################################################################################################
+##################################################################################################################################################################
     $zipyap_sonucu = zipData($dizinyolu.'/'.$dizinadi,    $zipdizinyolu.$zipyorumadizinadi."-".$simdizaman.'.zip');
 
     // Otomatik veya elle yürütme başarılı sonuç çıktısı
