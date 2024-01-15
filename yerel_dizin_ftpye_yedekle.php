@@ -52,13 +52,10 @@ include('includes/sub_navbar.php');
 
                             <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                             <div class="card-body">
-                                <p>Buradan daha önce yedeklediğiniz veri tabanı veya tabloları geri yükleyebilirsiniz</p>
-                                <p>Tüm web siteler için geçerli olan herhangi bir saldırı veya yanlışlıkla verilerin silinmesi durumlarda web sitenin geri getirilmesi için zaman zaman belirli aralıklarda veri tabanı yedeklenmesi gerekir.</p>
-                                <p>Bu script hem veri tabanı yedekleme hem de geri yükleme imkanı sağlamaktadır.</p>
-                                <p>Yönetim panelinde ayarları değiştirme ve veya ürünleri ekleme ve veya silme gibi çalışmalara başlamadan önce veri tabanını yedeklemenizi öneririz hatta tabloları ayrı ayrı yedekleme seçeneğini kullanarak yedeklemenizi öneririz</p>
-                                <p>Tabloları ayrı ayrı yedeklemenin avantajı tüm veri tabını geri yükleme yerine geri getirmek istediğiniz bir veya birden fazla tabloları ayrı ayrı geri yükleme imkanı sağlamasıdır.</p>
-                                <p>Buradan yedeklerinizi geri yükleme yapabileceğiniz gibi DENEME MODUNDA yükleme yaparak alınan yedeğin geri yüklemede herhangi bir sorun çıkarıp çıkarmayacağını yani yedeklemenin sağlıklı yapılıp yapılmadığını da test etmiş olursunuz (yedeğin sorunsuz olduğunu garantilemez).</p>
-                                <p><b>Not:</b> Buradan geri yükleme yapıldığında yedeğin içinde mevcut tablo adı ile sunucudaki veri tabanındaki tablo adı ile eşleşenler silinerek yerine yedekten geri yüklenecektir. Eşleşmeyen tablolar ise silinmeden kalacaktır.</p>
+<p>Buradan web dizinleri sıkıştırmadan dizin olarak uzak FTP hesabına elle yedekleyebileceğiniz gibi dizinler içinde gezinerek özel bir dosyayı da yedekleyebilirsiniz.
+</p>
+                                <b>Veritabanı yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span><br />
+                                <p><b>Web site zip yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.ZIPDIR)); ?></span></p>
                             </div>
                             </div>
                         </div><!-- / <div class="card"> -->

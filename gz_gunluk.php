@@ -103,10 +103,14 @@ include('includes/sub_navbar.php');
 
                             <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                             <div class="card-body">
-                                <p>Zaman zaman veritabanı yedeği alınması gerekir, bunun bir çok sebebi olabilir istemeden yapacağınız bir yanlış geri dönülmesi sağlayacağı gibi sitenize başkaları tarafından saldırıda veritabanındaki verilerin silinmesi gibi durumlarda sitenizin geri getirilmesini sağlar. Ancak bu veritabanı yedeklerin arada bir bilgisayarınıza indirmenizde fayda olacaktır.</p>
-                                <p>Yedeklenmiş veritabanlarınıza URL ile doğrudan ulaşılması mümkün değil, sadece FTP ile ulaşmak mümkündür. Ancak web sitenize hack gibi durumlar için garanti edilemez.</p>
-                                <p><b>ÖNEMLİ NOT:</b> sitenizde riskli değişiklikler ve ayarlamalar yapmadan önce veritabanın yedeğini almanız şiddetle önerilir.</p>
-                                <p><b>Yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span></p>
+<p>Buradan günlüğü etkinleştirilen zamanlanmış görevlerin yerine getirilmesinin sonucunu ve görevin ne zaman yerine getirildiğini ve ne kadar zaman aldığını görmenizi sağlar.
+</p>
+<p>Bu sayede zamanlanmış görevlerin sonuçlarını takip edebilirsiniz.
+</p>
+<p>Veritabanı boyutunun artması sorun teşkil ediyorsa zaman zaman eski günlükleri sile bilirsiniz.
+</p>
+                                <b>Veritabanı yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span><br />
+                                <p><b>Web site zip yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.ZIPDIR)); ?></span></p>
                             </div>
                             </div>
                         </div><!-- / <div class="card"> -->

@@ -55,7 +55,9 @@ include('includes/sub_navbar.php');
                             <p>Aynı web sitenin farklı tarihlere ait dosyalar bulunuyorsa eski zamana ait dosyaları ve artık yedeklemeye gerek kalmayan dosyaları silebilirsiniz</p>
                             <p>Yedekleme eksiksiz olup olmadığını kontrol etmek için klasör sayfadaki dosya sayısı ile buradaki ZIP dosyanın içindeki dosya sayılarının eşit olup olmadığını kontrol edebilirsiniz</p>
                             <p><b>NOT:</b> Web Sayfa Klasörleri alanında bir klasörü zip yaparken dosya adına tarih ekleniyor, ancak zip dosyasından dosyaları <i>çıkarırken</i> zip yaparken klasör adı ne idi ise aynı klasör adı oluşturarak dosyaları çıkaracaktır, ancak zipten çıkarırken klasör adını değiştirebilirsiniz.</p>
-                            <p>Aşağıdaki klasörler <b><?php echo htmlpath(DIZINDIR); ?>/</b> klasörden listeleniyor</p>
+                            <b>Veritabanı yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span><br />
+                            <b>Web site zip yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.ZIPDIR)); ?></span><br />
+                            <b>Aşağıdaki klasörler </b><span id="yol"><?php echo strtolower(htmlpath('./'.DIZINDIR)); ?></span> klasörden listeleniyor</p>
                             </div>
                             </div>
                         </div><!-- / <div class="card"> -->

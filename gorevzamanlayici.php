@@ -1030,10 +1030,27 @@ include('includes/sub_navbar.php');
 
                             <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                             <div class="card-body">
-                                <p>Zaman zaman veritabanı yedeği alınması gerekir, bunun bir çok sebebi olabilir istemeden yapacağınız bir yanlış geri dönülmesi sağlayacağı gibi sitenize başkaları tarafından saldırıda veritabanındaki verilerin silinmesi gibi durumlarda sitenizin geri getirilmesini sağlar. Ancak bu veritabanı yedeklerin arada bir bilgisayarınıza indirmenizde fayda olacaktır.</p>
-                                <p>Yedeklenmiş veritabanlarınıza URL ile doğrudan ulaşılması mümkün değil, sadece FTP ile ulaşmak mümkündür. Ancak web sitenize hack gibi durumlar için garanti edilemez.</p>
-                                <p><b>ÖNEMLİ NOT:</b> sitenizde riskli değişiklikler ve ayarlamalar yapmadan önce veritabanın yedeğini almanız şiddetle önerilir.</p>
-                                <p><b>Yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span></p>
+<p>Buradan görevleri zamanlayabilirsiniz.
+</p>
+<p>Bu script ile veritabanı yedekleme, web site dizinleri zip formatında yedekleme, ve TCMB dan döviz kuru güncelleme için üç dosyaya sahiptir.
+</p>
+<p><strong>backup.php</strong> veritabanı yedekler
+</p>
+<p><strong>zipyap.php</strong> web dizinleri zip formatında yedekler
+</p>
+<p><strong>kurlar.php</strong> TCMB dan döviz kuru günceller
+</p>
+<p>Eğer PHP kodu yazma bilginiz varsa kendize özel görevi yerine getirecek script yazabilirsiniz
+</p>
+<p>Buradan veritabanı yedekleme, web site dizin yedekleme, ve döviz kuru güncelleme görevleri ekleyebilir ve yönetebilirsiniz.
+</p>
+<p>Eklenmiş görevleri zamanı gelmeden dahi elle yürütme imkanı mevcuttur.
+</p>
+<p>Haftanın günlerinde hem * yıldız hemde haftanın günü veya günleri aynı anda seçilemez * yıldız seçildiğinde haftanın günleri devre dışı kalır, haftanın günü veya günleri seçildiğinde ayın günleri devre dışı kalır seçilen haftanın gün vey günlerinde çalışıyor. Bu seçenek mesai günlerinde veya mesai dışı günlerinde çalıştırma imkanı sağlar.
+</p>
+                                <b>Veritabanı yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span><br />
+                                <p><b>Web site zip yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.ZIPDIR)); ?></span></p>
+
                                 <p><strong>NOT:</strong> Eğer cPanel > Cron'dan bu <u>curl --silent https://siteniz.com/gorev.php</u> komutu ekleyip dakika başı çalışmasını ayarlarsanız web sitenizde belirleyeceğiniz tüm görevler tam zamanında çalışacaktır.</p>
                             </div>
                             </div>

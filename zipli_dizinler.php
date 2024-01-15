@@ -59,7 +59,8 @@ include('includes/sub_navbar.php');
                                 <p><b>üstüne yazma riski yok</b> mesajı, zip açılacağı klasör adında dizinde aynı klasörün olmadığını belirtiyor</p>
                                 <p><b>DİKKAT! Ana dizine açıyorsunuz!</b> mesajı, zip dosyanın içeriği ana dizinine açılacağını belirtiyor aynı isimli dosyalar olması durumunda üstüne yazılacaktır ve <b>kesinlikle tavsiye edilmez</b></p>
                                 <p><b>DİKKAT! Ana dizin yolu bozuldu</b> mesajı, ana dizin yolunun bozulduğunu belirtiyor, zip açılması sonucu yolun başlangıcı geçersiz ise bu scriptin içine açacaktır, eğer yolun başlangıcı geçerli ise geçerli olan yollardan devam ederek olmayan dizin ise oluşturarak açacaktır ve <b>kesinlikle tavsiye edilmez</b></p>
-                                <p>Aşağıdaki zipli dosyalar <b><?php echo htmlpath(ZIPDIR); ?>/</b> klasörden listeleniyor</p>
+                                <b>Veritabanı yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span><br />
+                                <b>Aşağıdaki zipli dosyalar </b><span id="yol"><?php echo strtolower(htmlpath('./'.ZIPDIR)); ?></span> klasörden listeleniyor</p>
                             </div>
                             </div>
                         </div><!-- / <div class="card"> -->

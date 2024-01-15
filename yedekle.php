@@ -64,7 +64,10 @@ include('includes/sub_navbar.php');
                                 <p>Zaman zaman veritabanı yedeği alınması gerekir, bunun bir çok sebebi olabilir istemeden yapacağınız bir yanlış geri dönülmesi sağlayacağı gibi sitenize başkaları tarafından saldırıda veritabanındaki verilerin silinmesi gibi durumlarda sitenizin geri getirilmesini sağlar. Ancak bu veritabanı yedeklerin arada bir bilgisayarınıza indirmenizde fayda olacaktır.</p>
                                 <p>Yedeklenmiş veritabanlarınıza URL ile doğrudan ulaşılması mümkün değil, sadece FTP ile ulaşmak mümkündür. Ancak web sitenize hack gibi durumlar için garanti edilemez.</p>
                                 <p>MySQL yedeklerden <b>.gz</b> ve <b>.sql</b> uzantılı dosyaların adını tıklayarak bilgisayarınıza indirebilirsiniz.</p>
-                                <p><b>ÖNEMLİ NOT:</b> sitenizde riskli değişiklikler ve ayarlamalar yapmadan önce veritabanın yedeğini almanız şiddetle önerilir.</p>                            </div>
+                                <p><b>ÖNEMLİ NOT:</b> sitenizde riskli değişiklikler ve ayarlamalar yapmadan önce veritabanın yedeğini almanız şiddetle önerilir.</p>
+                                <b>Veritabanı yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span><br />
+                                <p><b>Web site zip yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.ZIPDIR)); ?></span></p>
+                            </div>
                             </div>
                         </div><!-- / <div class="card"> -->
                     </div><!-- / <div id="accordion"> -->

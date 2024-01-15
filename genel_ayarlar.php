@@ -226,10 +226,18 @@ include('includes/sub_navbar.php');
 
                             <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                             <div class="card-body">
-                                <p>Zaman zaman veritabanı yedeği alınması gerekir, bunun bir çok sebebi olabilir istemeden yapacağınız bir yanlış geri dönülmesi sağlayacağı gibi sitenize başkaları tarafından saldırıda veritabanındaki verilerin silinmesi gibi durumlarda sitenizin geri getirilmesini sağlar. Ancak bu veritabanı yedeklerin arada bir bilgisayarınıza indirmenizde fayda olacaktır.</p>
-                                <p>Yedeklenmiş veritabanlarınıza URL ile doğrudan ulaşılması mümkün değil, sadece FTP ile ulaşmak mümkündür. Ancak web sitenize hack gibi durumlar için garanti edilemez.</p>
-                                <p><b>ÖNEMLİ NOT:</b> sitenizde riskli değişiklikler ve ayarlamalar yapmadan önce veritabanın yedeğini almanız şiddetle önerilir.</p>
-                                <p><b>Yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span></p>
+<p>Buradan web siteler yönetimi sitenin ayarlarını yapabilirsiniz.
+</p>
+<p><strong>Tarih ve Saat için Yerel Zaman Dilimi Ayarı</strong> alanında yedeklenen dosyaların ve günlükleri zamanları ve görevlerin gerçek zamanında görevleri yerine getirlmesi ve tarihlerin doğru gösterilmesi için yerel zamanınızı ayarlamanız gerekmektedir.
+</p>
+<p><strong>Veritabanı Geri Yükleme MySQL Karakter Seti Belirleme</strong> veritabanı yedekleme ve geri yüklemede sorun yaşamamak için veritabanınızın karakter kodunu ne ise burada da aynısını belirlemeniz gerekir ki latin olmayan karakterlerde sorun yaşamayasınız.
+</p>
+<p><strong>Web Dizin Listelemede Harıç Tutulacak Dizinleri ve Dosyaları Seçiniz</strong> web site dizinleri, veritabanı yedekler dizini, web site zip yedekler dizini listelerken hosting için gerekli olan dosyalar ve dizinleri hariç tutulacakları seçebilirsiniz bu sayede daha hızlı listelenecektir.
+</p>
+<p><strong>FTP Bilgileri</strong> bu alana uzak sunucuda bir FTP hesabınız varsa bilgilerini giriniz. Eğer uzak sunucuda FTP hesabınız yoksa hata mesajı vermemesi için bu hosting alanınızda bir dizin &quot;FTP_dizin&quot; oluşturarak bir FTP hesabı oluşturup bilgileri bu alana giriniz. Görev zamanlamada FTP ye yedekle seçeneği seçmeyerek aynı yedeği bir hostin alanında iki yerde yedeklenmesini önleyebilirsiniz.
+</p>
+                                <b>Veritabanı yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span><br />
+                                <p><b>Web site zip yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.ZIPDIR)); ?></span></p>
                             </div>
                             </div>
                         </div><!-- / <div class="card"> -->
