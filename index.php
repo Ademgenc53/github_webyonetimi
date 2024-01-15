@@ -97,6 +97,20 @@ include('includes/sub_navbar.php');
 </p>
 <p>Bu scriptte yedekleme yolları &quot;<strong>../VERITABANI_YEDEKLERI</strong>&quot;, &quot;<strong>../WEBSITE_ZIP_YEDEKLER</strong>&quot; şeklinde belirlemeniz yeterli olacaktır.
 </p>
+<p>&nbsp;
+</p>
+<p><strong>ZAMANLANMIŞ GÖREVLERİN TAM ZAMANINDA NASIL ÇALIŞIR?</strong>
+</p>
+<p>Zamanlanmış görevlerin zamanı gelen görevin çalışması için web site yönetimi sitenin birileri tarafından ziyaret edilmesi gerekiyor ki gorev.php çalışsın ki zamanı gelen görevleri yerine getirsin.
+</p>
+<p>Zamanın gelen görev siteyi kimse ziyaret etmediği için görev yerine getirilmediğinde ilk ziyaret edilmesi sırasında gecikmeli olarak zaman geçen görev yerine getirilir.
+</p>
+<p>Eğer görevlerin tam zamanında yerine getirilmesini istiyorsanız &quot;<strong>Cron İşleri</strong>&quot; kullanmanız gerekir.
+</p>
+<p><strong>cPanele</strong> Giriş yapın &gt; <strong>Cron Jobs/Cron İşleri</strong> tıklayın <strong>Ortak Ayarlar</strong> alanında görevlerinize uygun bir zaman seçin <strong>Komut:</strong> alanına <strong>curl --silent https://webyonetimi.com/gorev.php</strong> girip kaydedin (<em>domain adını düzenlemeyi unutmayın</em>)
+</p>
+<p>Artık siteyi kimse tarafında ziyaret edilmese bile <strong>Cron İşleri</strong>nde belirlediğiniz zaman dilimlerinde gorev.php dosyayı çalıştıracak ve zamanı gelen görevler zamanında yerine gitirilecektir.&nbsp;
+</p>
                                 <b>Veritabanı yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span><br />
                                 <p><b>Web site zip yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.ZIPDIR)); ?></span></p>
 
