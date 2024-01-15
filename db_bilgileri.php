@@ -225,7 +225,6 @@ include('includes/sub_navbar.php');
                             <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                             <div class="card-body">
                                 <p>Web yönetiminde yöneteceğiniz web sitelerin veritabanı bilgilerini ekleyiniz</p>
-                                <p>Buradan seçeceğiniz veri tabanı yedekleyebilir veya geri yükleyebilirsiniz.</p>
                                 <p><b>Yedeklerin bulunduğu dizin: </b><span id="yol"><?php echo strtolower(htmlpath('./'.BACKUPDIR)); ?></span></p>
                             </div>
                             </div>
