@@ -166,11 +166,11 @@ include('includes/sub_navbar.php');
                 echo '<tr><td>'.near_date($row['calisma_zamani']).'</td><td>'.$row['gorev_adi'].'</td><td>'.$row['calistirilan_dosya'].'</td><td>'.$row['calistirma_ciktisi'].'</td></tr>';
             }
         }else{
-            echo '<tr><td colspan="4" style="text-align: center;">ŞİMDİLİK HERHANGİ BİR GÖREV MEVCUT DEĞİL</td></tr>';
+            echo '<tr><td colspan="4" style="text-align: center;">ŞİMDİLİK HERHANGİ BİR YERİNE GETİRİLEN GÖREV MEVCUT DEĞİL</td></tr>';
         }
 ?>
                         <tr>
-                            <td>&nbsp;</td>
+                            <td colspan="4">&nbsp;</td>
                         </tr>
                     </tbody>
                 </table>
