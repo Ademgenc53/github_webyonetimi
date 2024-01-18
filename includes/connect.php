@@ -82,6 +82,7 @@ ini_set('display_errors', 1);
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
     // DEFINE de belirlenen dizin yoksa oluştur
+if(preg_match("/[a-zA-Z0-9_]/i", BACKUPDIR)){
     if(!file_exists(BACKUPDIR)){
         if (!mkdir(BACKUPDIR, 0777, true)) {
             die('Klasörler oluşturulamadı.');
@@ -90,6 +91,18 @@ ini_set('display_errors', 1);
     // Dizinin içine kimse ulaşamasın diye .htaccess oluşturuyoruz ve içine 'deny from all' yazıyoruz
     $file = new SplFileObject(BACKUPDIR . '/.htaccess', "w") ;
     $file->fwrite('deny from all');
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+if(preg_match("/[a-zA-Z0-9_]/i", ZIPDIR)){
+    if(!file_exists(ZIPDIR)){
+        if (!mkdir(ZIPDIR, 0777, true)) {
+            die('Klasörler oluşturulamadı.');
+        }
+    }
+    // Dizinin içine kimse ulaşamasın diye .htaccess oluşturuyoruz ve içine 'deny from all' yazıyoruz
+    $file = new SplFileObject(ZIPDIR . '/.htaccess', "w") ;
+    $file->fwrite('deny from all');
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
     /* BURAYAI DEĞİŞTİRMEYİN */
