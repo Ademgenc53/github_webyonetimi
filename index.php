@@ -169,10 +169,12 @@ include('includes/sub_navbar.php');
             echo '<tr><td colspan="4" style="text-align: center;">ŞİMDİLİK HERHANGİ BİR YERİNE GETİRİLEN GÖREV MEVCUT DEĞİL</td></tr>';
         }
 ?>
+                    </tbody>
+                    <tfoot>
                         <tr>
                             <td colspan="4">&nbsp;</td>
                         </tr>
-                    </tbody>
+                    </tfoot>
                 </table>
 
 
