@@ -157,7 +157,9 @@ include('includes/sub_navbar.php');
                     </thead>
                     <tbody>
 <?php 
-        $son_gorevler = $PDOdb->prepare(" SELECT MAX(calisma_zamani) AS calisma_zamani, gorev_adi, calistirilan_dosya, calistirma_ciktisi FROM zamanlanmisgorev_gunluk GROUP BY gorev_adi ORDER BY calisma_zamani DESC");
+        $son_gorevler = $PDOdb->prepare("SELECT calisma_zamani, gorev_adi, calistirilan_dosya, calistirma_ciktisi, id
+            FROM zamanlanmisgorev_gunluk
+            WHERE id IN(SELECT MAX(id) FROM zamanlanmisgorev_gunluk GROUP BY gorev_adi) ORDER BY calisma_zamani DESC");
         $son_gorevler->execute();
         $son_gorevler_arr = $son_gorevler->fetchAll();
         
